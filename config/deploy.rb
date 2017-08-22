@@ -20,7 +20,6 @@ end
 
 task :deploy do
   deploy do
-    invoke :'setup'
     invoke :'git:clone'
     invoke :'bundle:install'
 
