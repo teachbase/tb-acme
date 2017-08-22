@@ -4,22 +4,23 @@ require 'mina/git'
 require 'mina/puma'
 require 'yaml'
 
-config = YAML.load_file('./secrets.yml').fetch('production', {})
-
+config = YAML.load_file("#{File.dirname(__FILE__)}/secrets.yml").fetch('production', {})
 set :user, config['username']
-set :domain, config['host']
+set :domain, config['deploy_host']
 set :deploy_to, config['remote_path']
 set :repository, config['repository']
+set :shared_path, "#{config['remote_path']}/shared"
 
 task :setup => :environment do
-  queue! %(mkdir -p "#{deploy_to}/#{shared_path}/tmp/sockets")
-  queue! %(chmod g+rx,u+rwx "#{deploy_to}/#{shared_path}/tmp/sockets")
-  queue! %(mkdir -p "#{deploy_to}/#{shared_path}/tmp/pids")
-  queue! %(chmod g+rx,u+rwx "#{deploy_to}/#{shared_path}/tmp/pids")
+  command %{mkdir -p "#{fetch(:deploy_to)}/#{fetch(:shared_path)}/tmp/sockets"}
+  command %{chmod g+rx,u+rwx "#{fetch(:deploy_to)}/#{fetch(:shared_path)}/tmp/sockets"}
+  command %{mkdir -p "#{fetch(:deploy_to)}/#{fetch(:shared_path)}/tmp/pids"}
+  command %{chmod g+rx,u+rwx "#{fetch(:deploy_to)}/#{fetch(:shared_path)}/tmp/pids"}
 end
 
 task :deploy do
   deploy do
+    invoke :'setup'
     invoke :'git:clone'
     invoke :'bundle:install'
 
