@@ -1,11 +1,16 @@
+require 'yaml'
+
 workers 2
 
 threads 1, 4
 
-app_dir = File.expand_path("../..", __FILE__)
-shared_dir = "#{app_dir}/shared"
+env = (ENV['RACK_ENV'] || 'production')
+config = YAML.load_file("#{File.dirname(__FILE__)}/secrets.yml").fetch(env, {})
 
-environment "production"
+app_dir = File.expand_path("../..", __FILE__)
+shared_dir = "#{config['remote_path']}/shared"
+
+environment env
 
 bind "unix://#{shared_dir}/tmp/sockets/puma.sock"
 
