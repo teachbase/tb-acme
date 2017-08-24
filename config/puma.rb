@@ -5,16 +5,20 @@ workers 2
 threads 1, 4
 
 env = (ENV['RACK_ENV'] || 'production')
-config = YAML.load_file("#{File.dirname(__FILE__)}/secrets.yml").fetch(env, {})
 
-app_dir = File.expand_path("../..", __FILE__)
-shared_dir = "#{config['remote_path']}/shared"
+if env == 'production'
+  config = YAML.load_file("#{File.dirname(__FILE__)}/secrets.yml").fetch(env, {})
 
-environment env
+  app_dir = File.expand_path("../..", __FILE__)
+  shared_dir = "#{config['remote_path']}/shared"
 
-bind "unix://#{shared_dir}/tmp/sockets/puma.sock"
+  environment env
 
-# Set master PID and state locations
-pidfile "#{shared_dir}/tmp/pids/puma.pid"
-state_path "#{shared_dir}/tmp/pids/puma.state"
-activate_control_app
+  bind "unix://#{shared_dir}/tmp/sockets/puma.sock"
+  pidfile "#{shared_dir}/tmp/pids/puma.pid"
+  state_path "#{shared_dir}/tmp/pids/puma.state"
+  activate_control_app
+else
+  environment "development"
+  activate_control_app
+end

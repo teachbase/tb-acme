@@ -15,6 +15,10 @@ $public_path = '/webapps/teachbase/teachbase2/public'.freeze
 Dir["#{File.dirname(__FILE__)}/lib/**/*.rb"].each { |f| require(f) }
 
 Cuba.define do
+  on root do
+    res.write 'Hello cuba!'
+  end
+
   on 'api' do
     on 'v1' do
       on post do
