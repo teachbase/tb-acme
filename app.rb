@@ -5,8 +5,9 @@ require 'acme-client'
 require 'redis'
 require 'pry-byebug'
 require 'json'
-
 require 'openssl'
+
+$logger = Logger.new($stdout)
 
 $redis = Redis.new(host: 'localhost', port: 6379, db: 0)
 $acme_endpoint = 'https://acme-staging.api.letsencrypt.org/'.freeze
@@ -41,7 +42,7 @@ Cuba.define do
 
             registrator = CryptoRegistrator.new(account)
             registrator.register
-            binding.pry
+            $logger.info(registrator)
           end
 
           res.write "ok"

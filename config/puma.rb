@@ -12,6 +12,7 @@ if env == 'production'
   app_dir = File.expand_path("../..", __FILE__)
   shared_dir = "#{config['remote_path']}/shared"
 
+  stdout_redirect "#{shared_dir}/log/stdout", "#{shared_dir}/log/stderr"
   environment env
 
   bind "unix://#{shared_dir}/tmp/sockets/puma.sock"

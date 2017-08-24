@@ -9,3 +9,5 @@ gem 'pry-byebug'
 
 gem 'mina'
 gem 'mina-puma', require: false
+
+gem 'logger'

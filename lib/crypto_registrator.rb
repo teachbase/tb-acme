@@ -28,6 +28,7 @@ class CryptoRegistrator
 
     challenge = client.fetch_authorization(account.auth_uri).http01
     challenge.request_verification
+    $logger.info(challenge.authorization.verify_status)
   end
 
   def autorized?
