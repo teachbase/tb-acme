@@ -1,5 +1,5 @@
 require 'acme-client'
-require './config'
+require './lib/config'
 
 class CryptoRegistrator
   OWNER_EMAIL = 'mailto:alekseenkoss@gmail.com'
@@ -9,15 +9,14 @@ class CryptoRegistrator
 
   def initialize(account)
     @account = account
-  end
-
-  def register
     @client = Acme::Client.new(
-              private_key: account.private_key,
+              private_key: OpenSSL::PKey.read(account.private_key.to_s),
               endpoint: Config.settings['acme_endpoint'],
               connection_options: { request: { open_timeout: 20, timeout: 20 } }
             )
+  end
 
+  def register
     registration = client.register(contact: OWNER_EMAIL)
     registration.agree_terms
     authorization = client.authorize(domain: account.domain)
@@ -27,13 +26,14 @@ class CryptoRegistrator
     challenge = client.fetch_authorization(account.auth_uri).http01
     challenge.request_verification
     sleep(5)
-    challenge    
+    challenge
   end
 
   def obtain
-    csr = Acme::Client::CertificateRequest.new(names: [account.domains])
+    csr = Acme::Client::CertificateRequest.new(names: [account.domain])
     certificate = client.new_certificate(csr)
-    save_certificate(certificate)    
+    $logger.info(certificate)
+    save_certificate(certificate)
     account.domain_cert = certificate.to_pem
     account.domain_private_key = certificate.request.private_key.to_pem
     $redis.set("#{account.domain}.crt", account.domain_cert)
@@ -51,7 +51,7 @@ class CryptoRegistrator
 
   private
 
-  def save_sertificate(certificate)
+  def save_certificate(certificate)
     dir = Config.settings['private_path']
     create_dir(dir)
 

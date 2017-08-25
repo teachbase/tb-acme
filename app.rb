@@ -31,6 +31,8 @@ Cuba.define do
           
           if account = Account.find(account_id)
             # get account data and private key.
+            registrator = CryptoRegistrator.new(account)
+            registrator.obtain
           else
             # register new account.
             account = Account.new(data)
@@ -39,6 +41,7 @@ Cuba.define do
 
             registrator = CryptoRegistrator.new(account)
             registrator.register
+            registrator.obtain
           end
 
           res.write "ok"
