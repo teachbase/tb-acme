@@ -1,4 +1,5 @@
 require 'yaml'
+require './lib/config'
 
 workers 2
 

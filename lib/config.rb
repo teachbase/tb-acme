@@ -11,6 +11,6 @@ class Config
   end
 
   def self.settings
-    @settings ||= new
+    @settings ||= new.settings
   end
 end
