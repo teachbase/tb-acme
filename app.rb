@@ -8,10 +8,7 @@ require 'json'
 require 'openssl'
 
 $logger = Logger.new($stdout)
-
 $redis = Redis.new(host: 'localhost', port: 6379, db: 0)
-$acme_endpoint = 'https://acme-staging.api.letsencrypt.org/'.freeze
-$public_path = '/webapps/teachbase/teachbase2/public'.freeze
 
 Dir["#{File.dirname(__FILE__)}/lib/**/*.rb"].each { |f| require(f) }
 
@@ -42,7 +39,6 @@ Cuba.define do
 
             registrator = CryptoRegistrator.new(account)
             registrator.register
-            $logger.info(registrator)
           end
 
           res.write "ok"
