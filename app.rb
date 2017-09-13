@@ -27,23 +27,7 @@ Cuba.define do
                   {}
                 end
           
-          account_id = data.fetch('id', 0)
-          
-          if account = Account.find(account_id)
-            # get account data and private key.
-            registrator = CryptoRegistrator.new(account)
-            registrator.obtain
-          else
-            # register new account.
-            account = Account.new(data)
-            account.private_key = OpenSSL::PKey::RSA.new(4096)
-            account.save
-
-            registrator = CryptoRegistrator.new(account)
-            registrator.register
-            registrator.obtain
-          end
-
+          CertService.handle(data)
           res.write "ok"
         end
       end

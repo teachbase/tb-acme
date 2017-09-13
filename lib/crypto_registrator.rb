@@ -16,6 +16,7 @@ class CryptoRegistrator
             )
   end
 
+  # TODO: make async registration
   def register
     registration = client.register(contact: OWNER_EMAIL)
     registration.agree_terms
@@ -27,12 +28,17 @@ class CryptoRegistrator
     challenge.request_verification
     sleep(5)
     challenge
+
+    obtain
   end
 
   def obtain
+    $logger.info('-'*30 + "[OBTAIN START #{Time.now}] send request " + '-'*30)
     csr = Acme::Client::CertificateRequest.new(names: [account.domain])
     certificate = client.new_certificate(csr)
     $logger.info(certificate)
+    $logger.info('-'*30 + "[OBTAIN END #{Time.now}]" + '-'*30)
+
     save_certificate(certificate)
     account.domain_cert = certificate.to_pem
     account.domain_private_key = certificate.request.private_key.to_pem
