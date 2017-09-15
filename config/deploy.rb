@@ -10,7 +10,7 @@ set :domain, config['deploy_host']
 set :deploy_to, config['remote_path']
 set :repository, config['repository']
 set :shared_path, "#{config['remote_path']}/shared"
-set :shared_paths, ['config/secrets.yml']
+set :shared_files, ['config/secrets.yml']
 
 task :setup => :environment do
   command %{mkdir -p "#{fetch(:deploy_to)}/#{fetch(:shared_path)}/tmp/sockets"}
