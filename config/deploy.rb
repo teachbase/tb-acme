@@ -10,6 +10,7 @@ set :domain, config['deploy_host']
 set :deploy_to, config['remote_path']
 set :repository, config['repository']
 set :shared_path, "#{config['remote_path']}/shared"
+set :shared_paths, ['shared/config/secrets.yml']
 
 task :setup => :environment do
   command %{mkdir -p "#{fetch(:deploy_to)}/#{fetch(:shared_path)}/tmp/sockets"}
@@ -24,8 +25,8 @@ end
 task :deploy do
   deploy do
     invoke :'git:clone'
+    invoke :'deploy:link_shared_paths'
     invoke :'bundle:install'
-    invoke :'config_symlink'
     
     on :launch do
       # invoke :'puma:phased_restart'
