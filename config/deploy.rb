@@ -25,9 +25,9 @@ task :deploy do
   deploy do
     invoke :'git:clone'
     invoke :'bundle:install'
-
+    invoke :'config_symlink'
+    
     on :launch do
-      invoke :'config_symlink'
       # invoke :'puma:phased_restart'
     end
   end
