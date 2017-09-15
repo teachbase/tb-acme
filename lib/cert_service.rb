@@ -7,7 +7,7 @@ class CertService
     if account = Account.find(account_id)
       obtain_certificate(account)
     else
-      register_account(data)
+      register_account_and_obtain(data)
     end
   end
 
@@ -24,8 +24,9 @@ class CertService
     account
   end
 
-  def register_account(data)
+  def register_account_and_obtain(data)
     registrator = CryptoRegistrator.new(create_account(data))
     registrator.register
+    registrator.obtain
   end
 end
