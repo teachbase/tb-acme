@@ -28,7 +28,7 @@ task :deploy do
 
     on :launch do
       invoke :'config_symlink'
-      invoke :'puma:phased_restart'
+      # invoke :'puma:phased_restart'
     end
   end
 end

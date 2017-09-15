@@ -23,7 +23,7 @@ Cuba.define do
                   {}
                 end
           
-          CertService.handle(data)
+          CertService.new.handle(data)
           res.write "ok"
         end
       end
