@@ -41,7 +41,7 @@ class RedisModel
 
   def save
     if valid?
-      $redis.set("#{model_name}:#{id}", JSON.generate(as_json))
+      $redis.set(stored_key, JSON.generate(as_json))
       $redis.save
       return true
     end
@@ -64,5 +64,9 @@ class RedisModel
 
   def model_name
     self.class.name
+  end
+
+  def stored_key
+    "#{model_name}:#{id}"
   end
 end

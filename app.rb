@@ -13,10 +13,6 @@ $redis = Redis.new(host: 'localhost', port: 6379, db: 0)
 Dir["#{File.dirname(__FILE__)}/lib/**/*.rb"].each { |f| require(f) }
 
 Cuba.define do
-  on root do
-    res.write 'Hello cuba!'
-  end
-
   on 'api' do
     on 'v1' do
       on post do
