@@ -32,11 +32,10 @@ RSpec.describe Quota do
   end
 
   describe '#decr' do
-    before { quota.reset }
     subject { quota.decr }
 
     it 'decrements quota value' do
-      expect { subject }.to change { quota.reload.get }.by(-1)
+      expect(subject).to eq(Quota::LIMIT - 1)
     end
   end
 

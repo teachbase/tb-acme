@@ -9,6 +9,7 @@ class Quota
       decrement
     else
       reset
+      reload
       decrement
     end
   end
