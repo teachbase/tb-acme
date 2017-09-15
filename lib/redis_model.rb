@@ -3,7 +3,7 @@ require 'json'
 class RedisModel
   class << self
     def find(id)
-      data = $redis.get("account:#{id}")
+      data = $redis.get("#{self.name}:#{id}")
       return unless data
       new(JSON.parse(data))
     end

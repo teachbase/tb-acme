@@ -1,4 +1,5 @@
 require 'date'
+require './lib/redis_model'
 
 class CertExpiration < RedisModel
   REDIS_KEY_PREFIX = "cert:expire"

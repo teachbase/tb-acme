@@ -1,6 +1,6 @@
 class Quota
   REDIS_KEY = 'cert:week:count'.freeze
-  QUOTA_SIZE = 20
+  LIMIT = 20
 
   def get; counter; end
 
@@ -8,18 +8,24 @@ class Quota
     if available?
       decrement
     else
-      reset && return decrement
+      reset
+      decrement
     end
   end
 
   def reset
-    $redis.set(REDIS_KEY, QUOTA_SIZE)
+    $redis.set(REDIS_KEY, LIMIT)
     @counter = nil
     counter
   end
 
   def available?
-    counter > 0
+    counter.to_i > 0
+  end
+
+  def reload
+    @counter = $redis.get(REDIS_KEY)
+    self
   end
 
   private

@@ -6,6 +6,8 @@ class RedisModel
 end
 
 RSpec.describe RedisModel do
+  before { $redis.flushdb }
+  
   describe ".save" do
     let(:object) { described_class.new(id: 10) }
 
