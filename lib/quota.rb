@@ -2,6 +2,10 @@ class Quota
   REDIS_KEY = 'cert:week:count'.freeze
   LIMIT = 20
 
+  def initialize
+    reset if counter.nil?
+  end
+
   def get; counter; end
 
   def decr

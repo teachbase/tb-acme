@@ -1,16 +1,20 @@
 require 'spec_helper'
 require './lib/quota'
 
-RSpec.describe Quota do
-  before { $redis.flushdb }
+def flushdb
+  $redis.flushdb
+end
 
-  let(:quota) { described_class.new }
+RSpec.describe Quota do
+  before { flushdb }
+
+  let!(:quota) { described_class.new }
 
   describe "#get" do
     subject { quota.get }
 
-    it 'returns nill by default' do
-      expect(subject).to eq nil
+    it 'returns total limit by default' do
+      expect(subject).to eq described_class::LIMIT
     end
 
     context 'when has limit' do
@@ -27,7 +31,8 @@ RSpec.describe Quota do
     subject { quota.reset }
 
     it 'sets limit to default value' do
-      expect { subject }.to change { quota.get }.from(nil).to(20)
+      flushdb
+      expect { subject }.to change { quota.reload.get }.from(nil).to(20)
     end
   end
 
@@ -43,7 +48,10 @@ RSpec.describe Quota do
     subject { quota.available? }
 
     context 'when limit is 0' do
-      specify { expect(subject).to be_falsey }
+      specify do
+        flushdb && quota.reload
+        expect(subject).to be_falsey
+      end
     end
 
     context 'when limit is more than 0' do

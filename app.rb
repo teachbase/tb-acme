@@ -1,16 +1,14 @@
+require './boot'
 require "cuba"
 require "cuba/safe"
-require 'logger'
 require 'acme-client'
-require 'redis'
 require 'pry-byebug'
 require 'json'
 require 'openssl'
 
-$logger = Logger.new($stdout)
-$redis = Redis.new(host: 'localhost', port: 6379, db: 0)
-
 Dir["#{File.dirname(__FILE__)}/lib/**/*.rb"].each { |f| require(f) }
+
+Boot.load
 
 Cuba.define do
   on 'api' do
