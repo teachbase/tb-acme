@@ -8,6 +8,8 @@ threads 1, 4
 env = (ENV['RACK_ENV'] || 'production')
 
 if env == 'production'
+  daemonize
+
   config = YAML.load_file("#{File.dirname(__FILE__)}/secrets.yml").fetch(env, {})
 
   app_dir = File.expand_path("../..", __FILE__)
@@ -19,8 +21,6 @@ if env == 'production'
   bind "unix://#{shared_dir}/tmp/sockets/puma.sock"
   pidfile "#{shared_dir}/tmp/pids/puma.pid"
   state_path "#{shared_dir}/tmp/pids/puma.state"
-  activate_control_app
 else
   environment "development"
-  activate_control_app
 end
