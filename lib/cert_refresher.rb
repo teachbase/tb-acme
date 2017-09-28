@@ -1,5 +1,5 @@
-require './account'
-require './cert_expiration'
+require './lib/account'
+require './lib/cert_expiration'
 
 class CertRefresher
   def intializer(account_id)
@@ -10,11 +10,9 @@ class CertRefresher
     return false if @account.nil?
     reg = CryptoRegistrator.new(@account)
     
-    begin
-      reg.obtain
-    rescue => e
-      reg.register
-      reg.obtain
-    end 
+    # We must register account again
+    # because Letsencrypt will store info only 1 month
+    reg.register
+    reg.obtain
   end
 end

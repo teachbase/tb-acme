@@ -16,7 +16,8 @@ end
 namespace :cert do
   task :refresh do
     load_all
-    (CertExpiration.today&.account_ids || [])
-      .each { |account_id| CertRefresher.new(account_id).update }
+    CertExpiration.today&.account_ids&.each do |account_id|
+      CertRefresher.new(account_id).update
+    end
   end
 end

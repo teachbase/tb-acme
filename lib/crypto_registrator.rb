@@ -2,7 +2,7 @@ require 'acme-client'
 require './lib/config'
 
 class CryptoRegistrator
-  OWNER_EMAIL = 'mailto:alekseenkoss@gmail.com'
+  OWNER_EMAIL = Config.settings['owner_email']
   EXPIRATION_OFFSET = 83
 
   # Account must provide domain and private_key
@@ -31,31 +31,34 @@ class CryptoRegistrator
     challenge = client.fetch_authorization(account.auth_uri).http01
     challenge.request_verification
     sleep(5)
-    challenge
-
-    obtain
+    
+    if authorized?
+      obtain
+    else
+      sleep(5)
+      obtain
+    end
   end
 
   def obtain
     return false unless valid?
-    
-    $logger.info('-'*30 + "[OBTAIN START #{Time.now}] send request " + '-'*30)
+    log('OBTAIN START')
     csr = Acme::Client::CertificateRequest.new(names: [account.domain])
     certificate = client.new_certificate(csr)
-    $logger.info(certificate)
-    $logger.info('-'*30 + "[OBTAIN END #{Time.now}]" + '-'*30)
+    log('CERTIFICATE', certificate)
+    log('OBTAIN END')
 
     save_certificate(certificate)
     decrement_quota_counter
     set_cert_expiration
   end
 
-  def autorized?
+  def authorized?
     challenge.authorization.verify_status == 'valid'
   end
 
   def errors
-    challenge.authorization.http01.errors
+    challenge.errors
   end
 
   def valid?
@@ -107,5 +110,9 @@ class CryptoRegistrator
   def create_dir(dir)
     return if Dir.exists?(dir)
     FileUtils.mkdir_p(dir)
+  end
+
+  def log(event_name, *params)
+    $logger.info("[#{event_name}, #{Time.now}] #{params.join(', ')}")
   end
 end

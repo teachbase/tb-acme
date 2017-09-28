@@ -16,6 +16,6 @@ class CertExpiration < RedisModel
   end
 
   def self.today
-    find Date.today.strftime('%d%m%y')
+    find(Date.today.strftime('%d%m%y'))
   end
 end
