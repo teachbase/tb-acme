@@ -1,21 +1,29 @@
 class CertService
   attr_reader :registrator
 
+  # Handle params and creates/updates account, register and obtain cert.
+  # Params:
+  # +data+:: hash with account parameters {id, name, domain}
+
   def handle(data)
-    account_id = data.fetch('id', 0)
-          
-    if account = Account.find(account_id)
-      obtain_certificate(account)
+    account = Account.find(data.fetch('id', 0))
+    new_host = data['domain']
+
+    unless account
+      return register_account_and_obtain(create_account(data))
+    end
+
+    if new_host && !account.same_domain?(new_host)
+      account.domain = new_host
+      account.save
+      
+      register_account_and_obtain(account)
     else
-      register_account_and_obtain(data)
+      register_account_and_obtain(account)      
     end
   end
 
   private
-
-  def obtain_certificate(account)
-    CryptoRegistrator.new(account).obtain
-  end
 
   def create_account(data)
     account = Account.new(data)
@@ -24,8 +32,8 @@ class CertService
     account
   end
 
-  def register_account_and_obtain(data)
-    registrator = CryptoRegistrator.new(create_account(data))
+  def register_account_and_obtain(account)
+    registrator = CryptoRegistrator.new(account)
     registrator.register
     registrator.obtain
   end

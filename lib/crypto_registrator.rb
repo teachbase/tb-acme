@@ -83,8 +83,11 @@ class CryptoRegistrator
 
   def save_certificate(certificate)
     save_to_disk(certificate)
-    account.domain_cert = certificate.to_pem
+
+    # Set fullchain certificate to account settings
+    account.domain_cert = certificate.fullchain_to_pem
     account.domain_private_key = certificate.request.private_key.to_pem
+
     $redis.set("#{account.domain}.crt", account.domain_cert)
     $redis.set("#{account.domain}.key", account.domain_private_key)
     account.save
