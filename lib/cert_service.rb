@@ -4,23 +4,9 @@ class CertService
   # Handle params and creates/updates account, register and obtain cert.
   # Params:
   # +data+:: hash with account parameters {id, name, domain}
-
   def handle(data)
-    account = Account.find(data.fetch('id', 0))
-    new_host = data['domain']
-
-    unless account
-      return register_account_and_obtain(create_account(data))
-    end
-
-    if new_host && !account.same_domain?(new_host)
-      account.domain = new_host
-      account.save
-      
-      register_account_and_obtain(account)
-    else
-      register_account_and_obtain(account)      
-    end
+    account = load_account(data)
+    register_account_and_obtain(account)
   end
 
   private
@@ -36,5 +22,19 @@ class CertService
     registrator = CryptoRegistrator.new(account)
     registrator.register
     registrator.obtain
+  end
+
+  def load_account(data)
+    account = Account.find(data.fetch('id', 0))
+
+    return create_account(data) if account.nil?
+
+    new_host = data['domain']
+    if new_host && !account.same_domain?(new_host)
+      account.domain = new_host
+      account.save
+    end
+
+    account
   end
 end

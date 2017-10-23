@@ -22,16 +22,26 @@ class CryptoRegistrator
   def register
     return false unless valid?
 
-    registration = client.register(contact: OWNER_EMAIL)
-    registration.agree_terms
-    authorization = client.authorize(domain: account.domain)
-    account.auth_uri = authorization.uri
-    @challenge = authorization.http01
-    write_token(challenge.filename, challenge.file_content)
-    challenge = client.fetch_authorization(account.auth_uri).http01
-    challenge.request_verification
+    begin
+      registration = client.register(contact: OWNER_EMAIL)
+      registration.agree_terms
+      authorization = client.authorize(domain: account.domain)
+      account.auth_uri = authorization.uri
+      @challenge = authorization.http01
+      write_token(challenge.filename, challenge.file_content)
+      challenge = client.fetch_authorization(account.auth_uri).http01
+      challenge.request_verification
+    rescue => e
+      if /Registration key is already in use/ === e.message
+        return obtain
+      else
+        raise e
+      end
+    end
+
+    # If no any exceptions, then
+    # wait five seconds synchronously and obtain
     sleep(5)
-    
     if authorized?
       obtain
     else
