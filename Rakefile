@@ -45,7 +45,7 @@ namespace :cert do
     end
   end
 
-  task :rebuild, [:id] => [:environment] do |_t, args|
+  task :rebuild, [:id] do |_t, args|
     load_all
     rebuild_chain(args[:id])
   end
