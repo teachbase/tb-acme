@@ -12,7 +12,7 @@ class CertExpiration < RedisModel
   end
 
   def id
-    super || Date.today.strftime('%d%m%y')
+    @id || Date.today.strftime('%d%m%y')
   end
 
   def self.today
