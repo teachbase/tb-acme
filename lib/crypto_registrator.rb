@@ -41,12 +41,12 @@ class CryptoRegistrator
 
     # If no any exceptions, then
     # wait five seconds synchronously and obtain
-    sleep(5)
+    sleep(10)
     if authorized?
       obtain
     else
-      sleep(5)
-      obtain
+      log('REGISTER ACCOUNT ERR', errors)
+      log('AUTHORIZATION ERR', authorization.http01.error)
     end
   end
 
