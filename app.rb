@@ -21,6 +21,8 @@ Cuba.define do
                   {}
                 end
           
+          $logger.info("[ INCOME REQUEST, #{Time.now} ], #{data}")
+
           CertService.new.handle(data)
           res.write "ok"
         end

@@ -23,6 +23,7 @@ class CryptoRegistrator
     return false unless valid?
 
     begin
+      log('REGISTRATION START', "#{account.id} - #{account.domain}")
       registration = client.register(contact: OWNER_EMAIL)
       registration.agree_terms
       authorization = client.authorize(domain: account.domain)
@@ -33,6 +34,7 @@ class CryptoRegistrator
       challenge.request_verification
     rescue => e
       if /Registration key is already in use/ === e.message
+        log('REGISTRATION END')
         return obtain
       else
         raise e
@@ -43,6 +45,7 @@ class CryptoRegistrator
     # wait five seconds synchronously and obtain
     sleep(10)
     if authorized?
+      log('REGISTRATION END')
       obtain
     else
       log('REGISTER ACCOUNT ERR', errors)
