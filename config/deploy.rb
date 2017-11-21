@@ -2,6 +2,7 @@ require 'mina/bundler'
 require 'mina/rails'
 require 'mina/git'
 require 'mina/puma'
+require 'mina/whenever'
 require 'yaml'
 
 config = YAML.load_file("#{File.dirname(__FILE__)}/secrets.yml").fetch('production', {})
