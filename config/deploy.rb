@@ -29,6 +29,7 @@ task :deploy do
     invoke :'bundle:install'
     
     on :launch do
+      invoke :'whenever:update'
       invoke :'puma:restart'
     end
   end
