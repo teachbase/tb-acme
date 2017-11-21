@@ -3,5 +3,5 @@ every 1.day, at: '11:55pm' do
 end
 
 every 7.days, at: '11:30' do
-  rake 'quota:refresh'
+  rake 'quota:reset'
 end

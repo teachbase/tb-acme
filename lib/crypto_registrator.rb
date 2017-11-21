@@ -20,7 +20,10 @@ class CryptoRegistrator
 
   # TODO: make async registration
   def register
-    return false unless valid?
+    unless valid?
+      return false
+      log("INVALID", "Quota overhead")
+    end
 
     begin
       log('REGISTRATION START', "#{account.id} - #{account.domain}")
