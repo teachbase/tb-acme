@@ -37,7 +37,7 @@ class CryptoRegistrator
       challenge.request_verification
     rescue => e
       if /Registration key is already in use/ === e.message
-        log('REGISTRATION END')
+        log('REGISTRATION FAILED', e.message)
         return obtain
       else
         raise e
@@ -51,8 +51,8 @@ class CryptoRegistrator
       log('REGISTRATION END')
       obtain
     else
-      log('REGISTER ACCOUNT ERR', errors)
-      log('AUTHORIZATION ERR', authorization.http01.error)
+      log('REGISTRATION FAILED', errors)
+      log('REGISTRATION FAILED', authorization.http01.error)
     end
   end
 
