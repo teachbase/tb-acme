@@ -51,7 +51,6 @@ class CryptoRegistrator
       log('REGISTRATION END')
       obtain
     else
-      log('REGISTRATION FAILED', errors)
       log('REGISTRATION FAILED', authorization.http01.error)
     end
   end
@@ -71,10 +70,6 @@ class CryptoRegistrator
 
   def authorized?
     challenge.authorization.verify_status == 'valid'
-  end
-
-  def errors
-    challenge.errors
   end
 
   def valid?
