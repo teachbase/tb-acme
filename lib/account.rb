@@ -9,4 +9,8 @@ class Account < RedisModel
     return false unless external
     domain == external
   end
+
+  def reset_private_key
+    self.private_key = OpenSSL::PKey::RSA.new(4096)
+  end
 end

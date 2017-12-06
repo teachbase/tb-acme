@@ -13,7 +13,7 @@ class CertService
 
   def create_account(data)
     account = Account.new(data)
-    account.private_key = OpenSSL::PKey::RSA.new(4096)
+    account.reset_private_key
     account.save
     account
   end
@@ -32,9 +32,9 @@ class CertService
     new_host = data['domain']
     if new_host && !account.same_domain?(new_host)
       account.domain = new_host
-      account.save
     end
-
+    account.reset_private_key
+    account.save
     account
   end
 end
