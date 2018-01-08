@@ -81,8 +81,7 @@ class CryptoRegistrator
   def set_cert_expiration
     expiration_date = (Date.today + EXPIRATION_OFFSET).strftime('%d%m%y')
     if cert_exp = CertExpiration.find(expiration_date)
-      cert_exp.account_ids << account.id
-      cert_exp.save
+      cert_exp.append(account.id)
     else
       CertExpiration.new(id: expiration_date, account_ids: [account.id]).save
     end

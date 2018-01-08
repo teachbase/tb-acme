@@ -18,4 +18,10 @@ class CertExpiration < RedisModel
   def self.today
     find(Date.today.strftime('%d%m%y'))
   end
+
+  def append(account_id)
+    return if account_ids.include?(account_id.to_i)
+    self.account_ids << account_id
+    save
+  end
 end
