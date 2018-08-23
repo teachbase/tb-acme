@@ -43,7 +43,7 @@ class RedisModel
     data
   end
 
-  def save(exired = DEFAULT_EXPIRE)
+  def save(expired = DEFAULT_EXPIRE)
     if valid?
       $redis.setex(stored_key, expired, JSON.generate(as_json))
       $redis.save

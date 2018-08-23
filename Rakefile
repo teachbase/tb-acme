@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require "#{File.dirname(__FILE__)}/lib/quota"
 require "#{File.dirname(__FILE__)}/lib/cert_expiration"
 require "#{File.dirname(__FILE__)}/lib/cert_refresher"
 require "#{File.dirname(__FILE__)}/lib/config"
@@ -33,12 +32,6 @@ def rebuild_chain(account_id)
   $redis.set("#{account.domain}.crt", File.read(cert_path))
 end
 
-namespace :quota do
-  task :reset do
-    load_all
-    Quota.new.reset
-  end
-end
 
 namespace :cert do
   task :refresh do
