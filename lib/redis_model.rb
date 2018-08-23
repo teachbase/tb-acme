@@ -1,6 +1,10 @@
+# frozen_string_literal: true
+
 require 'json'
 
 class RedisModel
+  DEFAULT_EXPIRE = 60 * 60 * 24 * 7
+
   class << self
     def find(id)
       data = $redis.get("#{self.name}:#{id}")
@@ -39,15 +43,13 @@ class RedisModel
     data
   end
 
-  def save
-    return false unless valid?
-
-    $redis.set(stored_key, JSON.generate(as_json))
-    $redis.save
-    true
-  rescue Redis::CommandError => e
-    raise unless e.message =~ /save already in progress/
-    true
+  def save(exired = DEFAULT_EXPIRE)
+    if valid?
+      $redis.setex(stored_key, expired, JSON.generate(as_json))
+      $redis.save
+      return true
+    end
+    false
   end
 
   def id

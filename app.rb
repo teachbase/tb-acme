@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require './boot'
 require "cuba"
 require "cuba/safe"

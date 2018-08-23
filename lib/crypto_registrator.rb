@@ -1,16 +1,18 @@
+# frozen_string_literal: true
+
 require 'acme-client'
 require './lib/config'
 
 class CryptoRegistrator
   OWNER_EMAIL = Config.settings['owner_email']
   EXPIRATION_OFFSET = 83
+  ACME_DELAY_SEC = 20
 
   # Account must provide domain and private_key
-  attr_reader :account, :client, :challenge, :authrized, :quota
+  attr_reader :account, :client, :challenge, :authrized
 
   def initialize(account)
     @account = account
-    @quota = Quota.new
     @client = Acme::Client.new(
               private_key: OpenSSL::PKey.read(account.private_key.to_s),
               endpoint: Config.settings['acme_endpoint'],
@@ -20,77 +22,50 @@ class CryptoRegistrator
 
   # TODO: make async registration
   def register
-    return false unless valid?
+    begin
+      log(:info, 'REGISTRATION START', "#{account.id} - #{account.domain}")
+      registration = client.register(contact: OWNER_EMAIL)
+      registration.agree_terms
+      authorization = client.authorize(domain: account.domain)
+      account.auth_uri = authorization.uri
+      @challenge = authorization.http01
+      write_token(challenge.filename, challenge.file_content)
+      challenge = client.fetch_authorization(account.auth_uri).http01
+      challenge.request_verification
+    rescue => e
+      if /Registration key is already in use/ === e.message
+        log(:error, 'REGISTRATION FAILED', e.message)
+        return obtain
+      else
+        raise e
+      end
+    end
 
-    log('REGISTRATION START', "#{account.id} - #{account.domain}")
-    registration = client.register(contact: OWNER_EMAIL)
-    registration.agree_terms
-    log('REGISTRATION END')
+    sleep(ACMEACME_DELAY_SEC_DELAY)
 
-    obtain
-
-  rescue => e
-    log('REGISTRATION FAILED', e.message)
-    if /Registration key is already in use/ === e.message
+    if authorized?
+      log(:info, '[Authorized] REGISTRATION SUCCESS')
       obtain
     else
-      raise e
+      log(:error, '[Non authorized] REGISTRATION FAILED', authorization.http01.error)
     end
   end
 
   def obtain
-    return false unless authorize
-
-    log('OBTAIN START')
+    return false unless valid?
+    log(:info, '[ok] Certificate issuing...')
+    
     csr = Acme::Client::CertificateRequest.new(names: [account.domain])
     certificate = client.new_certificate(csr)
-    log('CERTIFICATE', certificate)
-    log('OBTAIN END')
-
+    
+    log(:info, '[OK] Certificate issued successful', certificate)
+    
     save_certificate(certificate)
-    decrement_quota_counter
     set_cert_expiration
-    true
-  rescue => e
-    log('OBTAIN FAILED', e.message)
-    raise e
-  end
-
-  def authorize
-    log('AUTHORIZATION START')
-    authorization    = client.authorize(domain: account.domain)
-    account.auth_uri = authorization.uri
-    @challenge       = authorization.http01
-    write_token(challenge.filename, challenge.file_content)
-    challenge = client.fetch_authorization(account.auth_uri).http01
-    challenge.request_verification
-    # Wait a bit for the server to make the request, or just blink. It should be fast.
-    sleep(10)
-    authorized?
-  rescue => e
-    log('AUTHORIZATION FAILED', e.message)
-    raise e
   end
 
   def authorized?
-    return false unless valid?
-
-    if challenge.authorization.verify_status == 'valid'
-      log('AUTHORIZATION SUCCESS')
-      true
-    else
-      log('AUTHORIZATION FAILED', authorization.http01.error)
-      false
-    end
-  end
-
-  def valid?
-    if quota.available?
-      true
-    else
-      log("QUOTA ORVERHEAD", "Registraion failed for account_id: #{account.id}, domain: #{account.domain}")
-      false
-    end
+    challenge.authorization.verify_status == 'valid'
   end
 
   private
@@ -102,10 +77,6 @@ class CryptoRegistrator
     else
       CertExpiration.new(id: expiration_date, account_ids: [account.id]).save
     end
-  end
-
-  def decrement_quota_counter
-    quota.decr
   end
 
   def save_certificate(certificate)
@@ -142,7 +113,7 @@ class CryptoRegistrator
     FileUtils.mkdir_p(dir)
   end
 
-  def log(event_name, *params)
-    $logger.info("[#{event_name}, #{Time.now}] #{params.join(', ')}")
+  def log(level, event_name, *params)
+    $logger.public_send(level, "[#{event_name}, #{Time.now}] #{params.join(', ')}")
   end
 end

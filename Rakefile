@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "#{File.dirname(__FILE__)}/lib/quota"
 require "#{File.dirname(__FILE__)}/lib/cert_expiration"
 require "#{File.dirname(__FILE__)}/lib/cert_refresher"

@@ -1,4 +1,4 @@
-job_type :rake, "cd :path && :environment_variable=:environment bundle exec rake :task"
+# frozen_string_literal: true
 
 every 1.day, at: '11:55pm' do
   rake "cert:refresh"

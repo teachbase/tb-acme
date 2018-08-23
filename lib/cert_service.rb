@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CertService
   attr_reader :registrator
 

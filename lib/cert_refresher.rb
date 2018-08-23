@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require './lib/account'
 require './lib/cert_expiration'
 require './lib/crypto_registrator'
