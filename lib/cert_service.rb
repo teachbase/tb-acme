@@ -11,14 +11,14 @@ class CertService
     register_account_and_obtain(account)
   end
 
-  private
-
   def create_account(data)
-    account = Account.new(data)
+    account = Models::Account.new(data)
     account.reset_private_key
     account.save
     account
   end
+
+  private
 
   def register_account_and_obtain(account)
     registrator = CryptoRegistrator.new(account)

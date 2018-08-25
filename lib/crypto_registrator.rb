@@ -5,8 +5,8 @@ require './lib/config'
 
 class CryptoRegistrator
   OWNER_EMAIL = Config.settings['owner_email']
-  EXPIRATION_OFFSET = 83
-  ACME_DELAY_SEC = 20
+  EXPIRATION_OFFSET = 60
+  ACME_DELAY_SEC = 5
 
   # Account must provide domain and private_key
   attr_reader :account, :client, :challenge, :authrized
@@ -14,48 +14,60 @@ class CryptoRegistrator
   def initialize(account)
     @account = account
     @client = Acme::Client.new(
-              private_key: OpenSSL::PKey.read(account.private_key.to_s),
-              endpoint: Config.settings['acme_endpoint'],
-              connection_options: { request: { open_timeout: 20, timeout: 20 } }
-            )
+                kid: account.kid,
+                private_key: OpenSSL::PKey.read(account.private_key.to_s),
+                directory: Config.settings['acme_endpoint'],
+                connection_options: { request: { open_timeout: 20, timeout: 20 } }
+              )
   end
 
   # TODO: make async registration
   def register
-    begin
-      log(:info, 'REGISTRATION START', "#{account.id} - #{account.domain}")
-      registration = client.register(contact: OWNER_EMAIL)
-      registration.agree_terms
-      authorization = client.authorize(domain: account.domain)
-      account.auth_uri = authorization.uri
-      @challenge = authorization.http01
-      write_token(challenge.filename, challenge.file_content)
-      challenge = client.fetch_authorization(account.auth_uri).http01
-      challenge.request_verification
-    rescue => e
-      if /Registration key is already in use/ === e.message
-        log(:error, 'REGISTRATION FAILED', e.message)
-        return obtain
-      else
-        raise e
-      end
+    log(:info, 'ACCOUNT REGISTRATION', "owner: #{OWNER_EMAIL}")
+    acme_account = client.new_account(contact: OWNER_EMAIL, terms_of_service_agreed: true)
+    account.kid = acme_account.kid
+    account
+  end
+
+  def order_certificate
+    log(:info, 'ORDER CERTIFICATE', "domain: #{account.domain}")
+    
+    order = client.new_order(identifiers: [account.domain])
+    authorization = order.authorizations.first
+    account.auth_uri = authorization.url
+    @challenge = authorization.http
+    write_token(challenge.filename, challenge.file_content)
+    challenge.request_validation
+
+    count = 0
+    while challenge.status == 'pending'
+      break if count >= 6
+      sleep(ACME_DELAY_SEC)
+      count += 1
+      challenge.reload
     end
 
-    sleep(ACMEACME_DELAY_SEC_DELAY)
+    challenge
 
-    if authorized?
-      log(:info, '[Authorized] REGISTRATION SUCCESS')
-      obtain
+  rescue => e
+    if /Registration key is already in use/ === e.message
+      log(:error, 'REGISTRATION FAILED', e.message)
+      return obtain
     else
-      log(:error, '[Non authorized] REGISTRATION FAILED', authorization.http01.error)
+      raise e
     end
   end
 
-  def obtain
-    return false unless valid?
-    log(:info, '[ok] Certificate issuing...')
+  def issue
+    return false unless authorized?
+
+    log(:info, 'Issue certificate')
     
-    csr = Acme::Client::CertificateRequest.new(names: [account.domain])
+    csr = Acme::Client::CertificateRequest.new(
+      private_key: OpenSSL::PKey::RSA.new(4096),
+      names: [account.domain]
+    )
+    
     certificate = client.new_certificate(csr)
     
     log(:info, '[OK] Certificate issued successful', certificate)
@@ -65,7 +77,7 @@ class CryptoRegistrator
   end
 
   def authorized?
-    challenge.authorization.verify_status == 'valid'
+    challenge.status == 'valid'
   end
 
   private

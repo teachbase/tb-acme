@@ -15,4 +15,8 @@ class Config
   def self.settings
     @settings ||= new.settings
   end
+
+  def self.settings=(hash = {})
+    @settings.merge(hash)
+  end
 end

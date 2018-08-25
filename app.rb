@@ -8,8 +8,6 @@ require 'pry-byebug'
 require 'json'
 require 'openssl'
 
-Dir["#{File.dirname(__FILE__)}/lib/**/*.rb"].each { |f| require(f) }
-
 Boot.load
 
 Cuba.define do

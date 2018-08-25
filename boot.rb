@@ -3,6 +3,8 @@
 require 'logger'
 require 'redis'
 
+Dir["#{File.dirname(__FILE__)}/lib/**/*.rb"].each { |f| require(f) }
+
 class Boot
   def self.load
     config = YAML.load_file("#{File.dirname(__FILE__)}/config/secrets.yml").fetch('production', {})
