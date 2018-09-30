@@ -13,6 +13,7 @@ set :domain, config['deploy_host']
 set :deploy_to, config['remote_path']
 set :port, config['deploy_port']
 set :repository, config['repository']
+set :branch, ENV['BRANCH'] || "master"
 set :shared_path, "#{config['remote_path']}/shared"
 set :shared_files, ['config/secrets.yml', 'config/puma.rb']
 

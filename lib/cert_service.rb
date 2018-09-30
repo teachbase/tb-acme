@@ -23,10 +23,12 @@ class CertService
   def register_account_and_obtain(account)
     registrator = CryptoRegistrator.new(account)
     registrator.register
+    registrator.order_certificate
+    registrator.issue
   end
 
   def load_account(data)
-    account = Account.find(data.fetch('id', 0))
+    account = Models::Account.find(data.fetch('id', 0))
 
     return create_account(data) if account.nil?
 

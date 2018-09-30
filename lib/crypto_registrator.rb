@@ -21,7 +21,6 @@ class CryptoRegistrator
               )
   end
 
-  # TODO: make async registration
   def register
     log(:info, 'ACCOUNT REGISTRATION', "owner: #{OWNER_EMAIL}")
     acme_account = client.new_account(contact: OWNER_EMAIL, terms_of_service_agreed: true)
