@@ -7,7 +7,7 @@ require 'mina/puma'
 require 'mina/whenever'
 require 'yaml'
 
-config = YAML.load_file("#{File.dirname(__FILE__)}/secrets.yml").fetch('production', {})
+config = YAML.load_file("#{File.dirname(__FILE__)}/secrets.yml").fetch((ENV['RACK_ENV'] || 'production'), {})
 set :user, config['username']
 set :domain, config['deploy_host']
 set :deploy_to, config['remote_path']
@@ -34,7 +34,9 @@ task :deploy do
 
     on :launch do
       invoke :'whenever:update'
-      invoke :'puma:restart'
+      
+      invoke :'puma:stop'
+      invoke :'puma:start'
     end
   end
 end
