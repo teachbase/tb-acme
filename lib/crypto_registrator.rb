@@ -89,7 +89,6 @@ class CryptoRegistrator
     )
 
     order.finalize(csr: csr)
-    certificate = client.new_certificate(csr)
     sleep(1) while order.status == 'processing'
     order.certificate
   end
