@@ -96,10 +96,10 @@ class CryptoRegistrator
 
   def set_cert_expiration
     expiration_date = (Date.today + EXPIRATION_OFFSET).strftime('%d%m%y')
-    if cert_exp = CertExpiration.find(expiration_date)
+    if cert_exp = Models::CertExpiration.find(expiration_date)
       cert_exp.append(account.id)
     else
-      CertExpiration.new(id: expiration_date, account_ids: [account.id]).save
+      Models::CertExpiration.new(id: expiration_date, account_ids: [account.id]).save
     end
   end
 
@@ -109,7 +109,6 @@ class CryptoRegistrator
     # Set fullchain certificate to account settings
     account.domain_cert = certificate
     account.domain_private_key = private_key.to_pem
-
     $redis.set("#{account.domain}.crt", account.domain_cert)
     $redis.set("#{account.domain}.key", account.domain_private_key)
     account.save
