@@ -9,7 +9,7 @@ class CryptoRegistrator
   ACME_DELAY_SEC = 5
 
   # Account must provide domain and private_key
-  attr_reader :account, :client, :challenge, :order, :certificate
+  attr_reader :account, :client, :challenge, :order, :certificate, :private_key
 
   def initialize(account)
     @account = account
@@ -70,11 +70,11 @@ class CryptoRegistrator
 
     log(:info, 'Issue certificate')
     
-    @certificate = waiting_ordered_certificate
+    certificate, private_key = waiting_ordered_certificate
     
     log(:info, '[OK] Certificate issued successful', certificate)
     
-    save_certificate(certificate)
+    save_certificate(certificate, private_key)
     set_cert_expiration
   end
 
@@ -90,7 +90,8 @@ class CryptoRegistrator
 
     order.finalize(csr: csr)
     sleep(1) while order.status == 'processing'
-    order.certificate
+    
+    [order.certificate, csr.private_key]
   end
 
   def set_cert_expiration
@@ -102,24 +103,23 @@ class CryptoRegistrator
     end
   end
 
-  def save_certificate(certificate)
-    save_to_disk(certificate)
+  def save_certificate(certificate, private_key)
+    save_to_disk(certificate, private_key)
 
     # Set fullchain certificate to account settings
-    account.domain_cert = certificate.fullchain_to_pem
-    account.domain_private_key = certificate.request.private_key.to_pem
+    account.domain_cert = certificate
+    account.domain_private_key = private_key.to_pem
 
     $redis.set("#{account.domain}.crt", account.domain_cert)
     $redis.set("#{account.domain}.key", account.domain_private_key)
     account.save
   end
 
-  def save_to_disk(certificate)
+  def save_to_disk(certificate, private_key)
     dir = Config.settings['private_path']
     create_dir(dir)
-
-    File.write("#{dir}/#{account.domain}.key", certificate.request.private_key.to_pem)
-    File.write("#{dir}/#{account.domain}.crt", certificate.fullchain_to_pem)
+    File.write("#{dir}/#{account.domain}.key", private_key.to_pem)
+    File.write("#{dir}/#{account.domain}.crt", certificate)
   end
 
   def write_token(filename, file_content)
