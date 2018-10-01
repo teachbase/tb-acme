@@ -9,7 +9,7 @@ class CryptoRegistrator
   ACME_DELAY_SEC = 5
 
   # Account must provide domain and private_key
-  attr_reader :account, :client, :challenge, :authrized
+  attr_reader :account, :client, :challenge, :order, :certificate
 
   def initialize(account)
     @account = account
@@ -21,6 +21,14 @@ class CryptoRegistrator
               )
   end
 
+  def perform
+    register
+    order_certificate
+    issue
+  end
+  
+  private
+
   def register
     log(:info, 'ACCOUNT REGISTRATION', "owner: #{OWNER_EMAIL}")
     acme_account = client.new_account(contact: OWNER_EMAIL, terms_of_service_agreed: true)
@@ -31,7 +39,7 @@ class CryptoRegistrator
   def order_certificate
     log(:info, 'ORDER CERTIFICATE', "domain: #{account.domain}")
     
-    order = client.new_order(identifiers: [account.domain])
+    @order = client.new_order(identifiers: [account.domain])
     authorization = order.authorizations.first
     account.auth_uri = authorization.url
     @challenge = authorization.http
@@ -51,7 +59,7 @@ class CryptoRegistrator
   rescue => e
     if /Registration key is already in use/ === e.message
       log(:error, 'REGISTRATION FAILED', e.message)
-      return obtain
+      return issue
     else
       raise e
     end
@@ -64,10 +72,10 @@ class CryptoRegistrator
     
     csr = Acme::Client::CertificateRequest.new(
       private_key: OpenSSL::PKey::RSA.new(4096),
-      names: [account.domain]
+      subject: { common_name: account.domain }
     )
     
-    certificate = client.new_certificate(csr)
+    @certificate = waiting_ordered_certificate
     
     log(:info, '[OK] Certificate issued successful', certificate)
     
@@ -79,7 +87,12 @@ class CryptoRegistrator
     challenge.status == 'valid'
   end
 
-  private
+  def waiting_ordered_certificate
+    order.finalize(csr: csr)
+    certificate = client.new_certificate(csr)
+    sleep(1) while order.status == 'processing'
+    order.certificate
+  end
 
   def set_cert_expiration
     expiration_date = (Date.today + EXPIRATION_OFFSET).strftime('%d%m%y')
@@ -106,10 +119,8 @@ class CryptoRegistrator
     dir = Config.settings['private_path']
     create_dir(dir)
 
-    File.write("#{dir}/#{account.domain}_privkey.pem", certificate.request.private_key.to_pem)
-    File.write("#{dir}/#{account.domain}_cert.pem", certificate.to_pem)
-    File.write("#{dir}/#{account.domain}_chain.pem", certificate.chain_to_pem)
-    File.write("#{dir}/#{account.domain}_fullchain.pem", certificate.fullchain_to_pem)
+    File.write("#{dir}/#{account.domain}.key", certificate.request.private_key.to_pem)
+    File.write("#{dir}/#{account.domain}.crt", certificate.fullchain_to_pem)
   end
 
   def write_token(filename, file_content)

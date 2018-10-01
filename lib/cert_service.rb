@@ -5,14 +5,14 @@ class CertService
 
   # Handle params and creates/updates account, register and obtain cert.
   # Params:
-  # +data+:: hash with account parameters {id, name, domain}
-  def handle(data)
-    account = load_account(data)
+  # +params+:: hash with account parameters {id, name, domain}
+  def handle(params)
+    account = load_account(params)
     register_account_and_obtain(account)
   end
 
-  def create_account(data)
-    account = Models::Account.new(data)
+  def create_account(params)
+    account = Models::Account.new(params)
     account.reset_private_key
     account.save
     account
@@ -21,18 +21,15 @@ class CertService
   private
 
   def register_account_and_obtain(account)
-    registrator = CryptoRegistrator.new(account)
-    registrator.register
-    registrator.order_certificate
-    registrator.issue
+    CryptoRegistrator.new(account).perform
   end
 
-  def load_account(data)
-    account = Models::Account.find(data.fetch('id', 0))
+  def load_account(params)
+    account = Models::Account.find(params.fetch('id', 0))
 
-    return create_account(data) if account.nil?
+    return create_account(params) if account.nil?
 
-    new_host = data['domain']
+    new_host = params['domain']
     if new_host && !account.same_domain?(new_host)
       account.domain = new_host
     end

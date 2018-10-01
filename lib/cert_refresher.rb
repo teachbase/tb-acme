@@ -10,7 +10,7 @@ class CertRefresher
 
   def update
     return false if @account.nil?
-    reg = CryptoRegistrator.new(@account)
+    CryptoRegistrator.new(@account).perform
     
     # We must register account again
     # because Letsencrypt will store info only 1 month
