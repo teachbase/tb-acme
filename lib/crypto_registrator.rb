@@ -70,11 +70,6 @@ class CryptoRegistrator
 
     log(:info, 'Issue certificate')
     
-    csr = Acme::Client::CertificateRequest.new(
-      private_key: OpenSSL::PKey::RSA.new(4096),
-      subject: { common_name: account.domain }
-    )
-    
     @certificate = waiting_ordered_certificate
     
     log(:info, '[OK] Certificate issued successful', certificate)
@@ -88,6 +83,11 @@ class CryptoRegistrator
   end
 
   def waiting_ordered_certificate
+     csr = Acme::Client::CertificateRequest.new(
+      private_key: OpenSSL::PKey::RSA.new(4096),
+      subject: { common_name: account.domain }
+    )
+
     order.finalize(csr: csr)
     certificate = client.new_certificate(csr)
     sleep(1) while order.status == 'processing'
