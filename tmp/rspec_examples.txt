@@ -1,10 +1,10 @@
 example_id                                       | status | run_time        |
 ------------------------------------------------ | ------ | --------------- |
-./spec/lib/models/cert_expiration_spec.rb[1:1:1] | passed | 0.00049 seconds |
-./spec/lib/models/redis_spec.rb[1:1:1]           | passed | 0.00032 seconds |
-./spec/lib/models/redis_spec.rb[1:1:2:1]         | passed | 0.00026 seconds |
-./spec/lib/models/redis_spec.rb[1:2:1]           | passed | 0.00066 seconds |
-./spec/lib/models/redis_spec.rb[1:3:1]           | passed | 0.00028 seconds |
-./spec/lib/models/redis_spec.rb[1:3:2]           | passed | 0.00245 seconds |
-./spec/lib/validations/dns_spec.rb[1:1:1]        | passed | 0.15668 seconds |
-./spec/lib/validations/dns_spec.rb[1:1:2:1]      | passed | 0.27453 seconds |
+./spec/lib/models/cert_expiration_spec.rb[1:1:1] | passed | 0.00039 seconds |
+./spec/lib/models/redis_spec.rb[1:1:1]           | passed | 0.00142 seconds |
+./spec/lib/models/redis_spec.rb[1:1:2:1]         | passed | 0.0004 seconds  |
+./spec/lib/models/redis_spec.rb[1:2:1]           | passed | 0.00012 seconds |
+./spec/lib/models/redis_spec.rb[1:3:1]           | passed | 0.00307 seconds |
+./spec/lib/models/redis_spec.rb[1:3:2]           | passed | 0.00021 seconds |
+./spec/lib/validations/dns_spec.rb[1:1:1]        | passed | 0.10474 seconds |
+./spec/lib/validations/dns_spec.rb[1:1:2:1]      | passed | 0.1326 seconds  |

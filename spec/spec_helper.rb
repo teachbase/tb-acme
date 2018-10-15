@@ -4,7 +4,10 @@ RSpec.configure do |config|
 
   require 'fakeredis'
   require 'pry-byebug'
-
+  require './boot'
+  
+  Boot.load
+  
   $redis = Redis.new
 
   config.expect_with :rspec do |expectations|

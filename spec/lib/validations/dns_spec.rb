@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require './lib/validations/dns'
 
 describe Validations::DNS do
   before { $redis.flushdb }

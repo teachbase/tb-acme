@@ -53,9 +53,7 @@ module Models
       false
     end
 
-    def id
-      0
-    end
+    def id; 0; end
 
     def add_error(attribute, message)
       @errors[attribute] = message

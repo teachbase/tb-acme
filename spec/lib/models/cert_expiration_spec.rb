@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require './lib/models/cert_expiration'
 
 RSpec.describe Models::CertExpiration do
   before { $redis.flushdb }
