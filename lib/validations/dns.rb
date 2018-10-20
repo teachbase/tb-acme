@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'resolv'
-require './lib/config'
 
 module Validations
   class DNS  

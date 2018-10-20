@@ -14,6 +14,6 @@ class CertService
 
   def register_account_and_obtain
     account = Models::Account.find_or_create_by(params)
-    CryptoRegistrator.new(account).perform
+    AcmeRegistrator.new(account).perform
   end
 end
