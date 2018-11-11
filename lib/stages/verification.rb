@@ -10,8 +10,11 @@ module Stages
     end
 
     def call
+      return @resource if @resource.invalid?
+
       write_verification_token
       waiting_for_verification
+      @resource
     end
 
     private
@@ -30,8 +33,6 @@ module Stages
         counter += 1
         challenge.reload
       end
-
-      challenge
     end
 
     def write_verification_token

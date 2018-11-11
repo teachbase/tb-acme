@@ -8,8 +8,6 @@ require 'pry-byebug'
 require 'json'
 require 'openssl'
 
-require_relative './lib/logger'
-
 Dir["#{File.dirname(__FILE__)}/lib/**/*.rb"].each { |f| require(f) }
 
 class Boot

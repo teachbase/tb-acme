@@ -7,6 +7,8 @@ module Stages
     end
 
     def call
+      return @resource if @resource.invalid?
+
       write_to_filesystem
       write_to_account
       write_to_storage

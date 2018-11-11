@@ -1,13 +1,15 @@
 # frozen_string_literal: true
 
 module Stages
-  class Registrator
+  class Registration
     def initialize(resource)
       @resource = resource
     end
 
     def call
-      Logger.info("[Registrator] called for owner <#{owner_email}>")
+      return @resource if @resource.invalid?
+
+      $logger.info("[Registration] called for owner #{owner_email}")
       registered = client.new_account(contact: owner_email, terms_of_service_agreed: true)
       @resource.account.kid = registered.kid
       @resource

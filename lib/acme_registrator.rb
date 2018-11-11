@@ -7,18 +7,15 @@ class AcmeRegistrator
 
   def initialize(account)
     @account = account
-    @resource = Stages::Resource.init(client: client, account: account)
   end
 
   def perform
-    if Validations::DNS.new(@resource.account.domain).valid?
-      Logger.error('DNS validation failed')
-      return
-    end
-
+    @resource = Stages::Resource.new(client: client, account: @account)
+    @resource = Stages::Validation.new(@resource).call
     @resource = Stages::Registration.new(@resource).call
     @resource = Stages::Order.new(@resource).call
     @resource = Stages::Verification.new(@resource).call
+    @resource = Stages::Issue.new(@resource).call
     @resource = Stages::Store.new(@resource).call
     @resource
   end
