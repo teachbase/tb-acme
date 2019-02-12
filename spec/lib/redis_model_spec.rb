@@ -7,7 +7,7 @@ end
 
 RSpec.describe RedisModel do
   before { $redis.flushdb }
-  
+
   describe ".save" do
     let(:object) { described_class.new(id: 10) }
 
@@ -20,10 +20,24 @@ RSpec.describe RedisModel do
 
     context 'without ID' do
       let(:object) { described_class.new }
-      
+
       it "save with default ID" do
         expect(subject).to be_truthy
         expect($redis.get("RedisModel:0")).to eq object.as_json.to_json
+      end
+    end
+
+    context 'when redis raises error' do
+      it 'returns true if error is about background save' do
+        allow($redis).to receive(:save).and_raise(
+          Redis::CommandError, 'ERR Background save already in progress'
+        )
+        expect(subject).to eq true
+      end
+
+      it 're-raises error if error is not about background save' do
+        allow($redis).to receive(:save).and_raise(Redis::CommandError, 'Fail')
+        expect { subject }.to raise_error(Redis::CommandError, 'Fail')
       end
     end
   end
