@@ -40,12 +40,14 @@ class RedisModel
   end
 
   def save
-    if valid?
-      $redis.set(stored_key, JSON.generate(as_json))
-      $redis.save
-      return true
-    end
-    false
+    return false unless valid?
+
+    $redis.set(stored_key, JSON.generate(as_json))
+    $redis.save
+    true
+  rescue Redis::CommandError => e
+    raise unless e.message =~ /save already in progress/
+    true
   end
 
   def id
