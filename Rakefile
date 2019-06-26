@@ -11,17 +11,17 @@ end
 
 def rebuild_chain(account_id)
   account = Account.find(account_id)
-  
+
   unless account
     puts "Error. Account with ID #{account_id} not found. Exit."
-    return 
+    return
   end
 
   puts "Rebuild certificate chain for: #{account.domain} "
 
   dir = Config.settings['private_path']
   cert_path = "#{dir}/#{account.domain}_fullchain.pem"
-  
+
   unless File.exists?(cert_path)
     puts "Error: fullcain.pem does not exist. Exit."
     return
