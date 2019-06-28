@@ -32,7 +32,7 @@ RSpec.describe Quota do
 
     it 'sets limit to default value' do
       flushdb
-      expect { subject }.to change { quota.reload.get }.from(nil).to(20)
+      expect { subject }.to change { quota.reload.get }.from(nil).to(40)
     end
   end
 

@@ -21,8 +21,8 @@ class CryptoRegistrator
   # TODO: make async registration
   def register
     unless valid?
+      log("QUOTA ORVERHEAD", "Registraion failed for account_id: #{account.id}, domain: #{account.domain}")
       return false
-      log("INVALID", "Quota overhead")
     end
 
     begin
@@ -57,6 +57,7 @@ class CryptoRegistrator
 
   def obtain
     return false unless valid?
+
     log('OBTAIN START')
     csr = Acme::Client::CertificateRequest.new(names: [account.domain])
     certificate = client.new_certificate(csr)
