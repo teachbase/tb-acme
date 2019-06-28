@@ -9,6 +9,7 @@ config = YAML.load_file("#{File.dirname(__FILE__)}/secrets.yml").fetch('producti
 set :user, config['username']
 set :domain, config['deploy_host']
 set :deploy_to, config['remote_path']
+set :port, config['deploy_port']
 set :repository, config['repository']
 set :shared_path, "#{config['remote_path']}/shared"
 set :shared_files, ['config/secrets.yml', 'config/puma.rb']
@@ -28,7 +29,7 @@ task :deploy do
     invoke :'git:clone'
     invoke :'deploy:link_shared_paths'
     invoke :'bundle:install'
-    
+
     on :launch do
       invoke :'whenever:update'
       invoke :'puma:restart'

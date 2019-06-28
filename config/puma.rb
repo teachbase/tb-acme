@@ -20,7 +20,7 @@ if env == 'production'
 
   bind "unix://#{shared_dir}/tmp/sockets/puma.sock"
   pidfile "#{shared_dir}/tmp/pids/puma.pid"
-  state_path "#{shared_dir}/tmp/pids/puma.state"
+  state_path "#{shared_dir}/tmp/sockets/puma.state"
   activate_control_app "unix://#{shared_dir}/tmp/sockets/pumactl.sock"
 else
   environment "development"
