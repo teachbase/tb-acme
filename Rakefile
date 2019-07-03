@@ -40,6 +40,7 @@ end
 namespace :cert do
   task :refresh do
     load_all
+    log('SCHEDULED JOB cert:refresh STARTS')
     CertExpiration.today&.account_ids&.each do |account_id|
       CertRefresher.new(account_id).update
     end

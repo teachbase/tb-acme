@@ -3,11 +3,15 @@ require './lib/cert_expiration'
 
 class CertRefresher
   def intializer(account_id)
+    log("REFRESHING FOR ID #{account_id} STARTS")
     @account = Account.find(account_id)
   end
 
   def update
-    return false if @account.nil?
+    if @account.nil?
+      log('REFRESHING CANCELED ACCOUNT NOT FOUND')
+      return false
+    end
     reg = CryptoRegistrator.new(@account)
 
     # We must register account again
