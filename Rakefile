@@ -40,7 +40,8 @@ end
 namespace :cert do
   task :refresh do
     load_all
-    log('SCHEDULED JOB cert:refresh STARTS')
+    logger = Logger.new('/webapps/tb_acme/shared/log/stdout')
+    logger.info("[ SCHEDULED JOB cert:refresh STARTS, #{Time.now} ]")
     CertExpiration.today&.account_ids&.each do |account_id|
       CertRefresher.new(account_id).update
     end
