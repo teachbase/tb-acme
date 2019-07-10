@@ -1,5 +1,6 @@
 require 'acme-client'
 require './lib/config'
+require '.lib/quota'
 
 class CryptoRegistrator
   OWNER_EMAIL = Config.settings['owner_email']

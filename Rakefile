@@ -1,5 +1,6 @@
 require "#{File.dirname(__FILE__)}/lib/quota"
 require "#{File.dirname(__FILE__)}/lib/cert_expiration"
+require "#{File.dirname(__FILE__)}/lib/cert_refresher"
 require "#{File.dirname(__FILE__)}/lib/config"
 require "#{File.dirname(__FILE__)}/lib/account"
 
