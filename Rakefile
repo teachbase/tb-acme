@@ -46,7 +46,6 @@ namespace :cert do
 
     if account_ids.empty?
       $logger.info("[ SCHEDULED JOB cert:refresh NO ACCOUNTS TO REFRESH ]")
-      return
     end
 
     account_ids.each do |account_id|
