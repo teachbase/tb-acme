@@ -36,8 +36,9 @@ class CryptoRegistrator
       challenge = client.fetch_authorization(account.auth_uri).http01
       challenge.request_verification
     rescue => e
+      log('REGISTRATION FAILED', e.message)
+
       if /Registration key is already in use/ === e.message
-        log('REGISTRATION FAILED', e.message)
         return obtain
       else
         raise e

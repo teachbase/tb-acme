@@ -41,9 +41,16 @@ end
 namespace :cert do
   task :refresh do
     load_all
-    logger = Logger.new('/webapps/tb_acme/shared/log/stdout')
-    logger.info("[ SCHEDULED JOB cert:refresh STARTS, #{Time.now} ]")
-    CertExpiration.today&.account_ids&.each do |account_id|
+    $logger.info("[ SCHEDULED JOB cert:refresh STARTS ]")
+    account_ids = CertExpiration.today&.account_ids.to_a
+
+    if account_ids.empty?
+      $logger.info("[ SCHEDULED JOB cert:refresh NO ACCOUNTS TO REFRESH ]")
+      return
+    end
+
+    account_ids.each do |account_id|
+      $logger.info("[ SCHEDULED JOB cert:refresh CALL REFRESHER FOR #{account_id} ]")
       CertRefresher.new(account_id).update
     end
   end
