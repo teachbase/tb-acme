@@ -21,7 +21,6 @@ class CertService
   def register_account_and_obtain(account)
     registrator = CryptoRegistrator.new(account)
     registrator.register
-    # registrator.obtain # we already obtain in register?
   end
 
   def load_account(data)

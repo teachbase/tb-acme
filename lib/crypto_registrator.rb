@@ -20,44 +20,26 @@ class CryptoRegistrator
 
   # TODO: make async registration
   def register
-    unless valid?
-      log("QUOTA ORVERHEAD", "Registraion failed for account_id: #{account.id}, domain: #{account.domain}")
-      return false
-    end
+    return false unless valid?
 
-    begin
-      log('REGISTRATION START', "#{account.id} - #{account.domain}")
-      registration = client.register(contact: OWNER_EMAIL)
-      registration.agree_terms
-      authorization = client.authorize(domain: account.domain)
-      account.auth_uri = authorization.uri
-      @challenge = authorization.http01
-      write_token(challenge.filename, challenge.file_content)
-      challenge = client.fetch_authorization(account.auth_uri).http01
-      challenge.request_verification
-    rescue => e
-      log('REGISTRATION FAILED', e.message)
+    log('REGISTRATION START', "#{account.id} - #{account.domain}")
+    registration = client.register(contact: OWNER_EMAIL)
+    registration.agree_terms
+    log('REGISTRATION END')
 
-      if /Registration key is already in use/ === e.message
-        return obtain
-      else
-        raise e
-      end
-    end
+    obtain
 
-    # If no any exceptions, then
-    # wait five seconds synchronously and obtain
-    sleep(10)
-    if authorized?
-      log('REGISTRATION END')
+  rescue => e
+    log('REGISTRATION FAILED', e.message)
+    if /Registration key is already in use/ === e.message
       obtain
     else
-      log('REGISTRATION FAILED', authorization.http01.error)
+      raise e
     end
   end
 
   def obtain
-    return false unless valid?
+    return false unless authorize
 
     log('OBTAIN START')
     csr = Acme::Client::CertificateRequest.new(names: [account.domain])
@@ -68,14 +50,47 @@ class CryptoRegistrator
     save_certificate(certificate)
     decrement_quota_counter
     set_cert_expiration
+    true
+  rescue => e
+    log('OBTAIN FAILED', e.message)
+    raise e
+  end
+
+  def authorize
+    log('AUTHORIZATION START')
+    authorization    = client.authorize(domain: account.domain)
+    account.auth_uri = authorization.uri
+    @challenge       = authorization.http01
+    write_token(challenge.filename, challenge.file_content)
+    challenge = client.fetch_authorization(account.auth_uri).http01
+    challenge.request_verification
+    # Wait a bit for the server to make the request, or just blink. It should be fast.
+    sleep(10)
+    authorized?
+  rescue => e
+    log('AUTHORIZATION FAILED', e.message)
+    raise e
   end
 
   def authorized?
-    challenge.authorization.verify_status == 'valid'
+    return false unless valid?
+
+    if challenge.authorization.verify_status == 'valid'
+      log('AUTHORIZATION SUCCESS')
+      true
+    else
+      log('AUTHORIZATION FAILED', authorization.http01.error)
+      false
+    end
   end
 
   def valid?
-    quota.available?
+    if quota.available?
+      true
+    else
+      log("QUOTA ORVERHEAD", "Registraion failed for account_id: #{account.id}, domain: #{account.domain}")
+      false
+    end
   end
 
   private

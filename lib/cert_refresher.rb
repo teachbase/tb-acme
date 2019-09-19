@@ -13,11 +13,10 @@ class CertRefresher
       $logger.info('[ REFRESHING CANCELED ACCOUNT NOT FOUND ]')
       return false
     end
-    reg = CryptoRegistrator.new(@account)
 
-    # We must register account again
-    # because Letsencrypt will store info only 1 month
+    reg = CryptoRegistrator.new(@account)
+    return if reg.obtain
+
     reg.register
-    # reg.obtain
   end
 end
