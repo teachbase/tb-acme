@@ -6,14 +6,14 @@ class CryptoRegistrator
   EXPIRATION_OFFSET = 83
 
   # Account must provide domain and private_key
-  attr_reader :account, :client, :challenge, :authrized, :quota, :authorization
+  attr_reader :account, :client, :challenge, :authrized, :quota, :authorization, :order
 
   def initialize(account)
     @account = account
     @quota = Quota.new
     @client = Acme::Client.new(
               private_key: OpenSSL::PKey.read(account.private_key.to_s),
-              endpoint: Config.settings['acme_endpoint'],
+              directory: Config.settings['directory'],
               connection_options: { request: { open_timeout: 20, timeout: 20 } }
             )
   end
@@ -23,8 +23,7 @@ class CryptoRegistrator
     return false unless valid?
 
     log('REGISTRATION START', "#{account.id} - #{account.domain}")
-    registration = client.register(contact: OWNER_EMAIL)
-    registration.agree_terms
+    registration = client.new_account(contact: OWNER_EMAIL, terms_of_service_agreed: true)
     log('REGISTRATION END')
 
     obtain
@@ -42,6 +41,7 @@ class CryptoRegistrator
     return false unless authorize
 
     log('OBTAIN START')
+    # todo: https://github.com/unixcharles/acme-client/tree/e63103aed294229e669ee0e022ba4f70d2460d4e#downloading-a-certificate
     csr = Acme::Client::CertificateRequest.new(names: [account.domain])
     certificate = client.new_certificate(csr)
     log('CERTIFICATE', certificate)
@@ -58,14 +58,14 @@ class CryptoRegistrator
 
   def authorize
     log('AUTHORIZATION START')
-    @authorization   = client.authorize(domain: account.domain)
-    account.auth_uri = authorization.uri
-    @challenge       = authorization.http01
+    @order = client.new_order(identifiers: [account.domain])
+    @authorization = order.authorizations.first
+    account.auth_uri = authorization.url
+    challenge = authorization.http
     write_token(challenge.filename, challenge.file_content)
-    challenge = client.fetch_authorization(account.auth_uri).http01
     challenge.request_verification
     # Wait a bit for the server to make the request, or just blink. It should be fast.
-    sleep(10)
+    sleep(2)
     authorized?
   rescue => e
     log('AUTHORIZATION FAILED', e.message)
@@ -75,11 +75,16 @@ class CryptoRegistrator
   def authorized?
     return false unless valid?
 
-    if challenge.authorization.verify_status == 'valid'
+    while challenge.status == 'pending'
+      sleep(2)
+      challenge.reload
+    end
+
+    if challenge.status == 'valid'
       log('AUTHORIZATION SUCCESS')
       true
     else
-      log('AUTHORIZATION FAILED', authorization.http01.error)
+      log('AUTHORIZATION FAILED', authorization.http.error)
       false
     end
   end
