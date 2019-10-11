@@ -6,7 +6,7 @@ class CryptoRegistrator
   EXPIRATION_OFFSET = 83
 
   # Account must provide domain and private_key
-  attr_reader :account, :client, :challenge, :authrized, :quota
+  attr_reader :account, :client, :challenge, :authrized, :quota, :authorization
 
   def initialize(account)
     @account = account
@@ -58,7 +58,7 @@ class CryptoRegistrator
 
   def authorize
     log('AUTHORIZATION START')
-    authorization    = client.authorize(domain: account.domain)
+    @authorization   = client.authorize(domain: account.domain)
     account.auth_uri = authorization.uri
     @challenge       = authorization.http01
     write_token(challenge.filename, challenge.file_content)
