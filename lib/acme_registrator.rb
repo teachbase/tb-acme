@@ -3,7 +3,12 @@
 require 'acme-client'
 
 class AcmeRegistrator
-  CONNECTION_TIMEOUT = 20
+  CONNECTION_OPTIONS = {
+    request: {
+      open_timeout: 20
+      timeout:      20
+    }
+  }.freeze
 
   def initialize(account)
     @account = account
@@ -19,15 +24,15 @@ class AcmeRegistrator
     @resource = Stages::Store.new(@resource).call
     @resource
   end
-  
+
   private
 
   def client
     @client ||= Acme::Client.new(
-      kid: @account.kid,
-      private_key: OpenSSL::PKey.read(@account.private_key.to_s),
-      directory: Config.settings['acme_endpoint'],
-      connection_options: { request: { open_timeout: CONNECTION_TIMEOUT, timeout: CONNECTION_TIMEOUT } }
+      kid:                @account.kid,
+      private_key:        OpenSSL::PKey.read(@account.private_key.to_s),
+      directory:          Config.settings['acme_endpoint'],
+      connection_options: CONNECTION_OPTIONS
     )
   end
 end

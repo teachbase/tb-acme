@@ -10,7 +10,7 @@ Cuba.define do
                 else
                   {}
                 end
-          
+
           $logger.info("[ INCOME REQUEST, #{Time.now} ], #{data}")
 
           CertService.new.perform(data)
