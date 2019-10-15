@@ -3,12 +3,12 @@
 require 'resolv'
 
 module Validations
-  class DNS  
+  class DNS
     attr_reader :domain, :resolver, :errors
 
     def initialize(domain)
-      @domain = domain
-      @errors = []
+      @domain   = domain
+      @errors   = []
       @resolver = Resolv::DNS.new
     end
 
@@ -38,8 +38,7 @@ module Validations
     end
 
     def validate_front_ip
-      return if frontend_ip.is_a?(Resolv::IPv4)
-      error("Frontend IPv4 Invalid")
+      error("Frontend IPv4 Invalid") unless frontend_ip.is_a?(Resolv::IPv4)
     end
 
     def equal_address?(addr)
@@ -48,8 +47,7 @@ module Validations
 
     def check_ip_v4
       addr = resolver.getaddress(domain)
-      return if addr.is_a?(Resolv::IPv4)
-      error("Domain #{domain} has invalid IPv4 address")
+      error("Domain #{domain} has invalid IPv4 address") unless addr.is_a?(Resolv::IPv4)
     end
 
     def check_ip_v6

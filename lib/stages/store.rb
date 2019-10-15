@@ -2,9 +2,13 @@
 
 module Stages
   class Store
-    def new(resource)
+    extend Forwardable
+
+    def initialize(resource)
       @resource = resource
     end
+
+    def_delegators :@resource, :certificate, :account, :private_key_pem
 
     def call
       return @resource if @resource.invalid?
@@ -17,25 +21,18 @@ module Stages
 
     private
 
-    def private_key_pem
-      @resource.private_key.to_pem
-    end
-
-    def certificate
-      @resource.certificate
-    end
-
     def write_to_filesystem
       return if Dir.exists?(private_path)
+
       FileUtils.mkdir_p(private_path)
-      File.write("#{private_path}/#{@resource.account.domain}.key", private_key_pem)
-      File.write("#{private_path}/#{@resource.account.domain}.crt", certificate)
+      File.write("#{private_path}/#{account.domain}.key", private_key_pem)
+      File.write("#{private_path}/#{account.domain}.crt", certificate)
     end
 
     def write_to_account
-      @resource.account.domain_cert = certificate
-      @resource.account.domain_private_key = private_key_pem
-      @resource.account.save
+      account.domain_cert        = certificate
+      account.domain_private_key = private_key_pem
+      account.save
     end
 
     def write_to_storage

@@ -5,7 +5,7 @@ require 'acme-client'
 class AcmeRegistrator
   CONNECTION_OPTIONS = {
     request: {
-      open_timeout: 20
+      open_timeout: 20,
       timeout:      20
     }
   }.freeze
