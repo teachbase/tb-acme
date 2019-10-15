@@ -2,9 +2,13 @@
 
 module Stages
   class Order
+    extend Forwardable
+
     def initialize(resource)
       @resource = resource
     end
+
+    def_delegators :@resource, :client, :account
 
     def call
       return @resource if @resource.invalid?
@@ -18,12 +22,8 @@ module Stages
 
     private
 
-    def account
-      @resource.account
-    end
-
     def order
-      @order ||= @client.new_order(identifiers: [account.domain])
+      @order ||= client.new_order(identifiers: [account.domain])
     end
 
     def authorization

@@ -8,7 +8,7 @@ module Stages
       @resource = resource
     end
 
-    def_delegators :@resource, :certificate, :account, :private_key_pem
+    def_delegators :@resource, :certificate, :account, :private_key
 
     def call
       return @resource if @resource.invalid?
@@ -20,6 +20,10 @@ module Stages
     end
 
     private
+
+    def private_key_pem
+      private_key.to_pem
+    end
 
     def write_to_filesystem
       return if Dir.exists?(private_path)

@@ -10,6 +10,7 @@ module Models
       def find(id)
         data = $redis.get("#{self.name}:#{id}")
         return unless data
+
         new(JSON.parse(data))
       end
 

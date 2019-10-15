@@ -40,8 +40,8 @@ module Stages
       end
 
       $logger.info('[OK] Certificate issued successful')
-      @resource.certificate     = order.certificate
-      @resource.private_key_pem = csr.private_key.to_pem
+      @resource.certificate = order.certificate
+      @resource.private_key = csr.private_key
       @resource
     end
 
