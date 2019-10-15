@@ -15,12 +15,12 @@ module Models
         account.save
         account
       end
-  
+
       def find_or_create_by(params)
         account = find(params.fetch('id', 0))
-    
+
         return create(params) if account.nil?
-    
+
         new_host = params['domain']
         if new_host && !account.same_domain?(new_host)
           account.domain = new_host

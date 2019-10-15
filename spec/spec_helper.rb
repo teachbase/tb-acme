@@ -1,13 +1,14 @@
 # frozen_string_literal: true
 
 RSpec.configure do |config|
+  ENV['RACK_ENV'] = 'test'
 
   require 'fakeredis'
   require 'pry-byebug'
   require './boot'
-  
+
   Boot.load
-  
+
   $redis = Redis.new
 
   config.expect_with :rspec do |expectations|

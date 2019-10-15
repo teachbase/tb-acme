@@ -9,7 +9,7 @@ module Stages
     def call
       return @resource if @resource.invalid?
 
-      $logger.info("[Certificate order] domain #{@account.domain}")
+      $logger.info("[Certificate order] domain #{account.domain}")
       @resource.account.auth_uri = authorization.url
       @resource.order = order
       @resource.challenge = challenge
@@ -18,8 +18,12 @@ module Stages
 
     private
 
+    def account
+      @resource.account
+    end
+
     def order
-      @order ||= @client.new_order(identifiers: [@account.domain])
+      @order ||= @client.new_order(identifiers: [account.domain])
     end
 
     def authorization

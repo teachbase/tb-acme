@@ -35,7 +35,6 @@ task :deploy do
 
     on :launch do
       invoke :'whenever:update'
-      
       invoke :'puma:stop'
       invoke :'puma:start'
     end
