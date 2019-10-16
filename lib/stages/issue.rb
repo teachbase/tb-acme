@@ -64,7 +64,11 @@ module Stages
     end
 
     def valid?
-      @resource.valid? && !challenge.nil? && challenge.status == 'valid'
+      result = @resource.valid? && !challenge.nil? && challenge.status == 'valid'
+      return true if result
+
+      $logger.info("[Challenge erors] challenge #{challenge} status #{challenge.try(:status)}")
+      false
     end
   end
 end
