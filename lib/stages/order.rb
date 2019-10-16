@@ -24,31 +24,22 @@ module Stages
 
     def order
       $logger.info("[Certificate order creating] domain #{account.domain}")
-
       @order ||= client.new_order(identifiers: [account.domain])
-
       $logger.info("[Certificate order created] domain #{account.domain}")
-
       @order
     end
 
     def authorization
       $logger.info("[Certificate order authorization] domain #{account.domain}")
-
       @authorization ||= order.authorizations.first
-
       $logger.info("[Certificate order authorization] domain #{account.domain} authorization #{@authorization}")
-
       @authorization
     end
 
     def challenge
       $logger.info("[Certificate challenge creating] domain #{account.domain}")
-
       @challenge ||= authorization.http
-
       $logger.info("[Certificate challenge created] domain #{account.domain} authorization #{@challenge}")
-
       @challenge
     end
   end

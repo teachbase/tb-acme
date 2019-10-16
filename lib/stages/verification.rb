@@ -47,9 +47,8 @@ module Stages
 
     def write_verification_token
       dir = File.join(public_path, File.dirname(challenge.filename))
-      return if Dir.exists?(dir)
+      FileUtils.mkdir_p(dir) unless Dir.exists?(dir)
 
-      FileUtils.mkdir_p(dir)
       File.write(File.join(public_path, challenge.filename), challenge.file_content)
     end
 
