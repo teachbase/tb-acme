@@ -22,6 +22,7 @@ class AcmeRegistrator
     @resource = Stages::Verification.new(@resource).call
     @resource = Stages::Issue.new(@resource).call
     @resource = Stages::Store.new(@resource).call
+    $logger.info("[Errors] #{@resource.errors}") if @resource.invalid?
     @resource
   end
 

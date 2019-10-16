@@ -15,8 +15,8 @@ module Stages
 
       $logger.info("[Certificate order] domain #{account.domain}")
       @resource.account.auth_uri = authorization.url
-      @resource.order = order
-      @resource.challenge = challenge
+      @resource.order            = order
+      @resource.challenge        = challenge
       @resource
     end
 

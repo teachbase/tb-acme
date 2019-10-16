@@ -14,6 +14,7 @@ module Stages
 
       write_verification_token
       waiting_for_verification
+      $logger.info("[Challenge verified] domain #{account.domain}")
       @resource
     end
 
