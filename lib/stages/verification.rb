@@ -22,6 +22,10 @@ module Stages
 
     private
 
+    def account
+      @resource.account
+    end
+
     def challenge
       @resource.challenge
     end
