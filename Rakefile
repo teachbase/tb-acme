@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require "#{File.dirname(__FILE__)}/lib/cert_expiration"
+require "#{File.dirname(__FILE__)}/lib/models/cert_expiration"
 require "#{File.dirname(__FILE__)}/lib/config"
-require "#{File.dirname(__FILE__)}/lib/account"
+require "#{File.dirname(__FILE__)}/lib/models/account"
 
 require "./boot"
 
