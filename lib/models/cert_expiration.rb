@@ -5,8 +5,6 @@ require './lib/models/redis'
 
 module Models
   class CertExpiration < Redis
-    REDIS_KEY_PREFIX = "cert:expire"
-
     set_attributes :id, :account_ids
 
     def initialize(*attrs)

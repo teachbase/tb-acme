@@ -11,7 +11,7 @@ def load_all
 end
 
 def rebuild_chain(account_id)
-  account = Account.find(account_id)
+  account = Models::Account.find(account_id)
   
   unless account
     puts "Error. Account with ID #{account_id} not found. Exit."
@@ -35,7 +35,7 @@ namespace :cert do
   task :refresh do
     load_all
     $logger.info("[ SCHEDULED JOB cert:refresh STARTS ]")
-    account_ids = CertExpiration.today&.account_ids.to_a
+    account_ids = Models::CertExpiration.today&.account_ids.to_a
 
     if account_ids.empty?
       $logger.info("[ SCHEDULED JOB cert:refresh NO ACCOUNTS TO REFRESH ]")

@@ -8,10 +8,14 @@ module Models
 
     class << self
       def find(id)
-        data = $redis.get("#{self.name}:#{id}")
+        data = $redis.get("#{self.demodulized_name}:#{id}")
         return unless data
 
         new(JSON.parse(data))
+      end
+
+      def demodulized_name
+        self.name.split('::').last
       end
 
       def set_attributes(*attrs)
@@ -67,7 +71,7 @@ module Models
     private
 
     def model_name
-      self.class.name
+      self.class.demodulized_name
     end
 
     def stored_key
