@@ -1,11 +1,14 @@
-require 'spec_helper'
-require './lib/redis_model'
+# frozen_string_literal: true
 
-class RedisModel
-  set_attributes :foo, :bar
+require 'spec_helper'
+
+module Models
+  class Redis
+    set_attributes :foo, :bar
+  end
 end
 
-RSpec.describe RedisModel do
+RSpec.describe Models::Redis do
   before { $redis.flushdb }
 
   describe ".save" do
@@ -15,7 +18,7 @@ RSpec.describe RedisModel do
 
     it 'creates data in redis' do
       expect(subject).to be_truthy
-      expect($redis.get("RedisModel:#{object.id}")).to eq object.as_json.to_json
+      expect($redis.get("Models::Redis:#{object.id}")).to eq object.as_json.to_json
     end
 
     context 'without ID' do
@@ -23,7 +26,7 @@ RSpec.describe RedisModel do
 
       it "save with default ID" do
         expect(subject).to be_truthy
-        expect($redis.get("RedisModel:0")).to eq object.as_json.to_json
+        expect($redis.get("Models::Redis:0")).to eq object.as_json.to_json
       end
     end
 

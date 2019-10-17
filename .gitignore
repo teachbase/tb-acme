@@ -1,3 +1,4 @@
 /config/secrets.yml
-
 /tmp
+.ruby-version
+.vscode/

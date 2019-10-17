@@ -1,7 +1,8 @@
-require 'spec_helper'
-require './lib/cert_expiration'
+# frozen_string_literal: true
 
-RSpec.describe CertExpiration do
+require 'spec_helper'
+
+RSpec.describe Models::CertExpiration do
   before { $redis.flushdb }
 
   let(:date) { Date.today.strftime('%d%m%y') }

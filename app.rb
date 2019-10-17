@@ -1,14 +1,4 @@
-require './boot'
-require "cuba"
-require "cuba/safe"
-require 'acme-client'
-require 'pry-byebug'
-require 'json'
-require 'openssl'
-
-Dir["#{File.dirname(__FILE__)}/lib/**/*.rb"].each { |f| require(f) }
-
-Boot.load
+# frozen_string_literal: true
 
 Cuba.define do
   on 'api' do
@@ -20,10 +10,10 @@ Cuba.define do
                 else
                   {}
                 end
-          
+
           $logger.info("[ INCOME REQUEST, #{Time.now} ], #{data}")
 
-          CertService.new.handle(data)
+          CertService.new.perform(data)
           res.write "ok"
         end
       end

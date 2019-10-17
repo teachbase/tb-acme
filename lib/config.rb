@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'yaml'
 
 class Config
@@ -12,5 +14,9 @@ class Config
 
   def self.settings
     @settings ||= new.settings
+  end
+
+  def self.settings=(hash = {})
+    @settings.merge(hash)
   end
 end

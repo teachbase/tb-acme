@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'mina/bundler'
 require 'mina/rails'
 require 'mina/git'
@@ -5,12 +7,13 @@ require 'mina/puma'
 require 'mina/whenever'
 require 'yaml'
 
-config = YAML.load_file("#{File.dirname(__FILE__)}/secrets.yml").fetch('production', {})
+config = YAML.load_file("#{File.dirname(__FILE__)}/secrets.yml").fetch((ENV['RACK_ENV'] || 'production'), {})
 set :user, config['username']
 set :domain, config['deploy_host']
 set :deploy_to, config['remote_path']
 set :port, config['deploy_port']
 set :repository, config['repository']
+set :branch, ENV['BRANCH'] || "master"
 set :shared_path, "#{config['remote_path']}/shared"
 set :shared_files, ['config/secrets.yml', 'config/puma.rb']
 
@@ -32,7 +35,8 @@ task :deploy do
 
     on :launch do
       invoke :'whenever:update'
-      invoke :'puma:restart'
+      invoke :'puma:stop'
+      invoke :'puma:start'
     end
   end
 end
