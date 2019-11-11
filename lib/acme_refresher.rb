@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class AcmeRefresher
-  def intializer(account_id)
+  def initialize(account_id)
     @account_id = account_id
     @account    = Models::Account.find(account_id)
   end
