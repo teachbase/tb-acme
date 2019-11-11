@@ -43,8 +43,13 @@ namespace :cert do
 
     account_ids.each do |account_id|
       $logger.info("[ SCHEDULED JOB cert:refresh CALL REFRESHER FOR #{account_id} ]")
-      AcmeRefresher.new(account_id).update
+      AcmeRefresher.new(account_id).perform
     end
+  end
+
+  task :refresh_account, [:id] do |_t, args|
+    load_all
+    AcmeRefresher.new(args[:id]).perform
   end
 
   task :rebuild, [:id] do |_t, args|

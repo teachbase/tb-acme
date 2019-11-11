@@ -2,11 +2,15 @@
 
 class AcmeRefresher
   def intializer(account_id)
-    @account = Models::Account.find(account_id)
+    @account_id = account_id
+    @account    = Models::Account.find(account_id)
   end
 
   def perform
-    return false if @account.nil?
+    if @account.nil?
+      $logger.info("[Error] Account with id #{@account_id} not found")
+      return false
+    end
     AcmeRegistrator.new(@account).perform
   end
 end
