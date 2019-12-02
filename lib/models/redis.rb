@@ -49,12 +49,12 @@ module Models
 
     def save
       if valid?
-        $redis.set(stored_key, expired, JSON.generate(as_json))
+        $redis.set(stored_key, JSON.generate(as_json))
         $redis.save
         return true
       end
       false
-    rescue Redis::CommandError => e
+    rescue ::Redis::CommandError => e
       raise unless e.message =~ /save already in progress/
       true
     end
