@@ -18,14 +18,11 @@ set :shared_path, "#{config['remote_path']}/shared"
 set :log_path, "#{config['remote_path']}/shared/log"
 set :shared_files, ['config/secrets.yml', 'config/puma.rb']
 
-task :copy_logs_to_tmp => :environment do
-  command %{cp "#{fetch(:log_path)}/stdout" "/tmp/stdout"}
-  command %{cp "#{fetch(:log_path)}/stderr" "/tmp/stderr"}
-end
-
-task :move_logs_from_tmp => :environment do
-  command %{mv "/tmp/stdout" "#{fetch(:log_path)}/stdout"}
-  command %{mv "/tmp/stderr" "#{fetch(:log_path)}/stderr"}
+task :preserve_logs => :environment do
+  command %{mkdir -p "#{fetch(:log_path)}/archived_logs"}
+  time = Time.now.strftime('%Y%m%d_%H_%M')
+  command %{cp "#{fetch(:log_path)}/stdout" "#{fetch(:log_path)}/archived_logs/#{time}_stdout"}
+  command %{cp "#{fetch(:log_path)}/stderr" "#{fetch(:log_path)}/archived_logs/#{time}_stderr"}
 end
 
 task :setup => :environment do
@@ -40,7 +37,7 @@ end
 
 task :deploy do
   deploy do
-    invoke :copy_logs_to_tmp
+    invoke :preserve_logs
     invoke :'git:clone'
     invoke :'deploy:link_shared_paths'
     invoke :'bundle:install'
@@ -49,7 +46,6 @@ task :deploy do
       invoke :'whenever:update'
       invoke :'puma:stop'
       invoke :'puma:start'
-      invoke :move_logs_from_tmp
     end
   end
 end
