@@ -15,7 +15,14 @@ set :port, config['deploy_port']
 set :repository, config['repository']
 set :branch, ENV['BRANCH'] || "master"
 set :shared_path, "#{config['remote_path']}/shared"
+set :log_path, "#{config['remote_path']}/shared/log"
 set :shared_files, ['config/secrets.yml', 'config/puma.rb']
+
+task :preserve_logs => :environment do
+  time = Time.now.strftime('%Y%m%d_%H_%M')
+  command %{cp "#{fetch(:log_path)}/stdout" "#{fetch(:log_path)}/#{time}_stdout"}
+  command %{cp "#{fetch(:log_path)}/stderr" "#{fetch(:log_path)}/#{time}_stderr"}
+end
 
 task :setup => :environment do
   command %{mkdir -p "#{fetch(:deploy_to)}/#{fetch(:shared_path)}/tmp/sockets"}
