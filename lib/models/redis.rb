@@ -4,8 +4,6 @@ require 'json'
 
 module Models
   class Redis
-    DEFAULT_EXPIRE = 60 * 60 * 24 * 7
-
     class << self
       def find(id)
         data = $redis.get("#{self.demodulized_name}:#{id}")
@@ -49,13 +47,16 @@ module Models
       data
     end
 
-    def save(expired = DEFAULT_EXPIRE)
+    def save
       if valid?
-        $redis.setex(stored_key, expired, JSON.generate(as_json))
+        $redis.set(stored_key, expired, JSON.generate(as_json))
         $redis.save
         return true
       end
       false
+    rescue Redis::CommandError => e
+      raise unless e.message =~ /save already in progress/
+      true
     end
 
     def id; 0; end

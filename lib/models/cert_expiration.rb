@@ -4,7 +4,7 @@ require 'date'
 require './lib/models/redis'
 
 module Models
-  class CertExpiration < Redis
+  class CertExpiration < Models::Redis
     set_attributes :id, :account_ids
 
     def initialize(*attrs)

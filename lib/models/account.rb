@@ -3,7 +3,7 @@
 require './lib/models/redis'
 
 module Models
-  class Account < Redis
+  class Account < Models::Redis
     set_attributes :id, :name, :private_key, :domain, :cert_created_at,
                   :cert_expired_at, :auth_status, :auth_uri, :domain_private_key,
                   :domain_cert, :kid
