@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 require 'date'
-require './lib/models/redis'
+require './lib/models/redis_model'
 
 module Models
-  class CertExpiration < Models::Redis
+  class CertExpiration < Models::RedisModel
     set_attributes :id, :account_ids
 
     def initialize(*attrs)

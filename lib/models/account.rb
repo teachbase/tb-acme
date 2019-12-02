@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require './lib/models/redis'
+require './lib/models/redis_model'
 
 module Models
-  class Account < Models::Redis
+  class Account < Models::RedisModel
     set_attributes :id, :name, :private_key, :domain, :cert_created_at,
                   :cert_expired_at, :auth_status, :auth_uri, :domain_private_key,
                   :domain_cert, :kid

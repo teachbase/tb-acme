@@ -3,7 +3,7 @@
 require 'json'
 
 module Models
-  class Redis
+  class RedisModel
     class << self
       def find(id)
         data = $redis.get("#{self.demodulized_name}:#{id}")
