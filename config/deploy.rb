@@ -23,7 +23,7 @@ task :copy_logs_to_tmp => :environment do
   command %{cp "#{fetch(:log_path)}/stderr" "/tmp/stderr"}
 end
 
-task :move_logs_to_tmp => :environment do
+task :move_logs_from_tmp => :environment do
   command %{mv "/tmp/stdout" "#{fetch(:log_path)}/stdout"}
   command %{mv "/tmp/stderr" "#{fetch(:log_path)}/stderr"}
 end
