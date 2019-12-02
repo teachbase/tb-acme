@@ -36,6 +36,7 @@ end
 
 task :deploy do
   deploy do
+    invoke :preserve_logs
     invoke :'git:clone'
     invoke :'deploy:link_shared_paths'
     invoke :'bundle:install'
