@@ -17,6 +17,12 @@ Cuba.define do
           res.write "ok"
         end
       end
+
+      on get do
+        on 'test' do
+          raise StandardError
+        end
+      end
     end
   end
 end

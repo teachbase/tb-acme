@@ -10,6 +10,7 @@ gem 'whenever'
 gem 'mina'
 gem 'mina-puma', require: false
 gem 'mina-whenever'
+gem 'sentry-raven'
 
 gem 'logger'
 

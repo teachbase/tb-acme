@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'acme-client'
+require 'raven'
 
 class AcmeRegistrator
   CONNECTION_OPTIONS = {
@@ -22,7 +23,7 @@ class AcmeRegistrator
     @resource = Stages::Verification.new(@resource).call
     @resource = Stages::Issue.new(@resource).call
     @resource = Stages::Store.new(@resource).call
-    $logger.info("[Errors] #{@resource.errors}") if @resource.invalid?
+    handle_errors
     @resource
   end
 
@@ -34,6 +35,23 @@ class AcmeRegistrator
       private_key:        OpenSSL::PKey.read(@account.private_key.to_s),
       directory:          Config.settings['acme_endpoint'],
       connection_options: CONNECTION_OPTIONS
+    )
+  end
+
+  def handle_errors
+    return unless @resource.invalid?
+
+    $logger.info("[Errors] #{@resource.errors}")
+    field, message = @resource.first
+    Raven.capture_message(
+      message,
+      tags: { type: 'ssl_cert_release_error' },
+      extra: {
+        field:      field,
+        account_id: @account.id,
+        domain:     @account.domain
+      },
+      level: 'error'
     )
   end
 end
