@@ -3,7 +3,6 @@
 require "#{File.dirname(__FILE__)}/lib/models/cert_expiration"
 require "#{File.dirname(__FILE__)}/lib/config"
 require "#{File.dirname(__FILE__)}/lib/models/account"
-require 'raven'
 
 require "./boot"
 
@@ -34,27 +33,23 @@ end
 
 namespace :cert do
   task :refresh do
-    Raven.capture :logger => 'rake', :tags => { rake_task: 'refresh' } do
-      load_all
-      $logger.info("[ SCHEDULED JOB cert:refresh STARTS ]")
-      account_ids = Models::CertExpiration.today&.account_ids.to_a
+    load_all
+    $logger.info("[ SCHEDULED JOB cert:refresh STARTS ]")
+    account_ids = Models::CertExpiration.today&.account_ids.to_a
 
-      if account_ids.empty?
-        $logger.info("[ SCHEDULED JOB cert:refresh NO ACCOUNTS TO REFRESH ]")
-      end
+    if account_ids.empty?
+      $logger.info("[ SCHEDULED JOB cert:refresh NO ACCOUNTS TO REFRESH ]")
+    end
 
-      account_ids.each do |account_id|
-        $logger.info("[ SCHEDULED JOB cert:refresh CALL REFRESHER FOR #{account_id} ]")
-        AcmeRefresher.new(account_id).perform
-      end
+    account_ids.each do |account_id|
+      $logger.info("[ SCHEDULED JOB cert:refresh CALL REFRESHER FOR #{account_id} ]")
+      AcmeRefresher.new(account_id).perform
     end
   end
 
   task :refresh_account, [:id] do |_t, args|
-    Raven.capture :logger => 'rake', :tags => { rake_task: 'refresh_account' } do
-      load_all
-      AcmeRefresher.new(args[:id]).perform
-    end
+    load_all
+    AcmeRefresher.new(args[:id]).perform
   end
 
   task :rebuild, [:id] do |_t, args|
