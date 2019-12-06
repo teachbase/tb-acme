@@ -42,16 +42,20 @@ class AcmeRegistrator
     return unless @resource.invalid?
 
     $logger.info("[Errors] #{@resource.errors}")
-    field, message = @resource.first
-    Raven.capture_message(
-      message,
-      tags: { type: 'ssl_cert_release_error' },
-      extra: {
-        field:      field,
-        account_id: @account.id,
-        domain:     @account.domain
-      },
-      level: 'error'
-    )
+    field, message = @resource.errors.first
+    @resource.errors.each do |h|
+      field = h.keys.first
+      message = h[field]
+      Raven.capture_message(
+        message,
+        tags: { type: 'ssl_cert_release_error' },
+        extra: {
+          field:      field,
+          account_id: @account.id,
+          domain:     @account.domain
+        },
+        level: 'error'
+      )
+    end
   end
 end
