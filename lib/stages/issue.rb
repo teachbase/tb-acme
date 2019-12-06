@@ -14,7 +14,7 @@ module Stages
     def_delegators :@resource, :order, :account, :challenge
 
     def call
-      return @resource unless @resource.valid? && challeng_valid?
+      return @resource unless @resource.valid? && challenge_valid?
 
       $logger.info("[Issue certificate] domain #{account.domain}")
       waiting_ordered_certificate
