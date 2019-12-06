@@ -36,7 +36,7 @@ module Stages
 
     def challenge
       @challenge ||= authorization.http
-      @challenge.error(:authorization, "Http challenge failed") unless @challenge
+      @resource.error(:authorization, "Http challenge failed") unless @challenge
       @challenge
     end
   end

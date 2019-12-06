@@ -69,7 +69,7 @@ module Stages
     def challenge_valid?
       @resource.error(:authorization, "Challenge not present") if challenge.nil?
       @resource.error(:authorization, "Challenge not valid") if challenge.status != 'valid'
-      @return.errors.empty?
+      @resource.errors.empty?
     end
   end
 end
