@@ -30,7 +30,7 @@ module Stages
     end
 
     def waiting_for_verification
-      challenge.request_validation
+      $logger.info(challenge.request_validation)
       $logger.info("[Challenge verification requested] challenge #{challenge}")
 
       counter = 0
@@ -42,6 +42,7 @@ module Stages
         challenge.reload
         $logger.info("[Challenge verification waiting] #{counter}/#{TIMEOUT}")
       end
+      $logger.info(challenge)
     end
 
     def pending?
