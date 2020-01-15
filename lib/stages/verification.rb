@@ -14,9 +14,8 @@ module Stages
 
       $logger.info("[Challenge verification starts] domain #{account.domain}")
       write_verification_token
-      $logger.info("[Challenge verification token saved] domain #{account.domain}")
       waiting_for_verification
-      $logger.info("[Challenge verified] domain #{account.domain}")
+      @resource.error(:authorization, "Challenge not verified") if pending?
       @resource
     end
 
@@ -35,7 +34,7 @@ module Stages
       $logger.info("[Challenge verification requested] challenge #{challenge}")
 
       counter = 0
-      while challenge.status == 'pending'
+      while pending?
         break if counter >= TIMEOUT
 
         sleep(ACME_DELAY_SEC)
@@ -43,6 +42,10 @@ module Stages
         challenge.reload
         $logger.info("[Challenge verification waiting] #{counter}/#{TIMEOUT}")
       end
+    end
+
+    def pending?
+      challenge.status == 'pending'
     end
 
     def write_verification_token

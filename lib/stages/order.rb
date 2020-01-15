@@ -23,23 +23,20 @@ module Stages
     private
 
     def order
-      $logger.info("[Certificate order creating] domain #{account.domain}")
       @order ||= client.new_order(identifiers: [account.domain])
-      $logger.info("[Certificate order created] domain #{account.domain}")
+      @resource.error(:order, "Order not created") unless @order
       @order
     end
 
     def authorization
-      $logger.info("[Certificate order authorization] domain #{account.domain}")
       @authorization ||= order.authorizations.first
-      $logger.info("[Certificate order authorization] domain #{account.domain} authorization #{@authorization}")
+      @resource.error(:authorization, "Authorization not created") unless @authorization
       @authorization
     end
 
     def challenge
-      $logger.info("[Certificate challenge creating] domain #{account.domain}")
       @challenge ||= authorization.http
-      $logger.info("[Certificate challenge created] domain #{account.domain} authorization #{@challenge}")
+      @resource.error(:authorization, "Http challenge failed") unless @challenge
       @challenge
     end
   end

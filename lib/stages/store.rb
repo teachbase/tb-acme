@@ -16,6 +16,7 @@ module Stages
       write_to_filesystem
       write_to_account
       write_to_storage
+      $logger.info('[OK] Certificate saved')
       @resource
     end
 
@@ -29,20 +30,17 @@ module Stages
       FileUtils.mkdir_p(private_path) unless Dir.exists?(private_path)
       File.write("#{private_path}/#{account.domain}.key", private_key_pem)
       File.write("#{private_path}/#{account.domain}.crt", certificate)
-      $logger.info('[OK] Certificate saved to filesystem')
     end
 
     def write_to_account
       account.domain_cert        = certificate
       account.domain_private_key = private_key_pem
       account.save
-      $logger.info('[OK] Certificate saved to account')
     end
 
     def write_to_storage
       $redis.set("#{account.domain}.crt", certificate)
       $redis.set("#{account.domain}.key", private_key_pem)
-      $logger.info('[OK] Certificate saved to redis')
     end
 
     def private_path

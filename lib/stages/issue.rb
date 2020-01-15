@@ -14,13 +14,12 @@ module Stages
     def_delegators :@resource, :order, :account, :challenge
 
     def call
-      unless valid?
-        @resource.error(:challenge, 'Challenge does not exists or status is NOT VALID')
-        return @resource
-      end
+      return @resource unless @resource.valid? && challenge_valid?
 
+      $logger.info("[Issue certificate] domain #{account.domain}")
       waiting_ordered_certificate
       set_certificate_expiration
+      @resource.error(:order, "Certificate not issued") if processing?
       @resource
     end
 
@@ -32,17 +31,21 @@ module Stages
       order.finalize(csr: csr)
 
       counter = 0
-      while order.status == 'processing'
+      while processing?
         break if counter >= TIMEOUT
+
         sleep(1)
         counter += 1
         challenge.reload
       end
 
-      $logger.info('[OK] Certificate issued successful')
       @resource.certificate = order.certificate
       @resource.private_key = csr.private_key
       @resource
+    end
+
+    def processing?
+      order.status == 'processing'
     end
 
     def set_certificate_expiration
@@ -63,11 +66,11 @@ module Stages
       )
     end
 
-    def valid?
-      result = @resource.valid? && !challenge.nil? && challenge.status == 'valid'
-      return true if result
+    def challenge_valid?
+      @resource.error(:authorization, "Challenge not present") if challenge.nil?
+      return true if challenge.status == 'valid'
 
-      $logger.info("[Challenge erors] challenge #{challenge} status #{challenge&.status}")
+      @resource.error(:authorization, "Challenge status #{challenge.status}")
       false
     end
   end
