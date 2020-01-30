@@ -1,10 +1,11 @@
+#!/usr/bin/env puma
+
 # frozen_string_literal: true
 
 require 'yaml'
 require './lib/config'
 
 workers 2
-
 threads 1, 4
 
 env = (ENV['RACK_ENV'] || 'production')
@@ -13,6 +14,8 @@ if env == 'production'
   config = YAML.load_file("#{File.dirname(__FILE__)}/secrets.yml").fetch(env, {})
   app_dir = File.expand_path("../..", __FILE__)
 
+  rackup "#{app_dir}/config.ru"
+  directory app_dir
   stdout_redirect "#{app_dir}/log/stdout", "#{app_dir}/log/stderr"
   environment env
 
