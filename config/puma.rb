@@ -5,6 +5,7 @@
 require 'yaml'
 require './lib/config'
 
+bind 'tcp://0.0.0.0:9292'
 workers 2
 threads 1, 4
 
@@ -19,10 +20,8 @@ if env == 'production'
   stdout_redirect "#{app_dir}/log/stdout", "#{app_dir}/log/stderr"
   environment env
 
-  bind "unix://#{app_dir}/tmp/sockets/puma.sock"
   pidfile "#{app_dir}/tmp/pids/puma.pid"
   state_path "#{app_dir}/tmp/sockets/puma.state"
-  activate_control_app "unix://#{app_dir}/tmp/sockets/pumactl.sock"
 else
   environment "development"
 end
