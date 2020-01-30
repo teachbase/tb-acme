@@ -50,7 +50,7 @@ module Models
     def save
       if valid?
         $redis.set(stored_key, JSON.generate(as_json))
-        $redis.save
+        #$redis.save
         return true
       end
       false
