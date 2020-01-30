@@ -17,7 +17,7 @@ if env == 'production'
 
   rackup "#{app_dir}/config.ru"
   directory app_dir
-  stdout_redirect "#{app_dir}/log/stdout", "#{app_dir}/log/stderr"
+  #stdout_redirect "#{app_dir}/log/stdout", "#{app_dir}/log/stderr"
   environment env
 
   pidfile "#{app_dir}/tmp/pids/puma.pid"

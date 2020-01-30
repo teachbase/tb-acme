@@ -15,11 +15,13 @@ Dir["#{File.dirname(__FILE__)}/lib/**/*.rb"].each { |f| require(f) }
 class Boot
   def self.load
     Raven.configure do |config|
-      config.dsn = Config.settings['raven_dsn']
+      config.dsn = ENV['RAVEN_DSN']
       config.environments = ['staging', 'production']
     end
 
     $logger = ::Logger.new(STDOUT)
-    $redis  = ::Redis.new(host: 'localhost', port: 6379, db: 0)
+
+    redis_params = Config.settings['redis_master'].transform_keys(&:to_sym)
+    $redis  = ::Redis.new(**redis_params)
   end
 end
