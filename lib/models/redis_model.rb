@@ -50,7 +50,7 @@ module Models
     def save
       if valid?
         $redis.set(stored_key, JSON.generate(as_json))
-        #$redis.save
+        $redis.save unless cloud_redis?
         return true
       end
       false
@@ -77,6 +77,10 @@ module Models
 
     def stored_key
       "#{model_name}:#{id}"
+    end
+
+    def cloud_redis?
+      Config.settings['cloud_redis']&.to_bool
     end
   end
 end

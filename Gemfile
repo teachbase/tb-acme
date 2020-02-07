@@ -11,8 +11,7 @@ gem 'mina'
 gem 'mina-puma', require: false
 gem 'mina-whenever'
 gem 'sentry-raven'
-
-gem 'logger'
+gem 'logstash-logger'
 
 group :test do
   gem "rspec"

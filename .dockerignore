@@ -1,0 +1,6 @@
+.git
+.gitignore
+.dockerprod/
+README.md
+
+/config/secrets.yml.example

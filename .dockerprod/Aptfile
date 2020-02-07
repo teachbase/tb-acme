@@ -1,0 +1,13 @@
+build-essential
+gnupg2
+curl
+less
+git
+wget
+netcat
+locales
+vim
+libpcre++-dev
+libssl-dev
+libgeoip-dev
+bison
