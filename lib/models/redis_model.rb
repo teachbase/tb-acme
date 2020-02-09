@@ -80,7 +80,7 @@ module Models
     end
 
     def cloud_redis?
-      Config.settings['cloud_redis']&.to_bool
+      Config.settings['cloud_redis']
     end
   end
 end
