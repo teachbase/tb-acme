@@ -23,6 +23,9 @@ services:
     depends_on:
       - redis
       - api
+    links:
+      - redis
+      - api
     healthcheck:
       test: ["CMD-SHELL", "ps ax | grep -v grep | grep nginx || exit 1"]
       interval: 5s
@@ -52,11 +55,14 @@ services:
     image: redis:5-alpine
     container_name: acme_redis
     restart: always
+    command:
+      - redis-server
+      - /etc/redis/redis.conf
     expose:
       - 6379
     volumes:
       - redis:/var/lib/redis/data
-      - ./.dockerprod/redis/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./.dockerprod/redis/redis.conf:/etc/redis/redis.conf
     healthcheck:
       test: redis-cli ping
       interval: 1s
