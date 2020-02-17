@@ -41,6 +41,7 @@ services:
     volumes:
       - public-content:/webapps/tb_acme/public
       - private-content:/webapps/tb_acme/private
+      - ./.dockerprod/acme/secrets.yml:/webapps/tb_acme/config/secrets.yml
     environment:
       - RACK_ENV=production
     depends_on:
