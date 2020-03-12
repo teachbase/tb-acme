@@ -16,7 +16,7 @@ module Stages
       write_verification_token
       waiting_for_verification
       @resource.error(:authorization, "Challenge not verified") if pending?
-      @resource.error(:authorization, challenge.error) if invalid?
+      @resource.error(:authorization, "Challenge error: #{challenge.error}") if invalid?
       @resource
     end
 
