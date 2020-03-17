@@ -4,9 +4,6 @@ SHELL ["/bin/bash", "-c"]
 ARG BUNDLER_VERSION=1.17.3
 ARG NGINX_VERSION=1.17.7
 ARG APP_DIR=/webapps/tb_acme
-ARG APP_USER=tb
-
-USER root
 
 # Install dependencies
 COPY ./Aptfile /tmp/Aptfile
@@ -52,11 +49,6 @@ RUN mkdir -p $APP_DIR/tmp/sockets && \
 RUN bundle config set deployment 'true' && \
     bundle config set without 'test development' && \
     bundle install
-
-# Create user
-RUN useradd -m $APP_USER
-RUN chown -R $APP_USER:$APP_USER $APP_DIR
-USER $APP_USER
 
 ENV RACK_ENV=production
 

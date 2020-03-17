@@ -7,14 +7,12 @@ services:
       context: .
       dockerfile: ./.dockerprod/nginx/Dockerfile
     restart: always
-    environment:
-      - REDIS_URL=redis://redis:6379/
     volumes:
       - ./.dockerprod/nginx/certs:/etc/nginx/certs
       - ./.dockerprod/nginx/config:/etc/nginx/conf.d
       - ./.dockerprod/nginx/mruby:/etc/nginx/mruby
       - ./.dockerprod/nginx/nginx.conf:/etc/nginx/nginx.conf
-      - public-content:/webapps/tb_acme/public:ro
+      - /u1:/webapps/tb_acme/public
       - private-content:/webapps/tb_acme/private:ro
     ports:
       - 80:80
@@ -39,7 +37,7 @@ services:
     stdin_open: true
     restart: always
     volumes:
-      - public-content:/webapps/tb_acme/public
+      - /u1:/webapps/tb_acme/public
       - private-content:/webapps/tb_acme/private
       - ./.dockerprod/acme/secrets.yml:/webapps/tb_acme/config/secrets.yml
     environment:
@@ -72,5 +70,4 @@ services:
 
 volumes:
   redis:
-  public-content:
   private-content:
