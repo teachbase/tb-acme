@@ -1,19 +1,21 @@
+# frozen_string_literal: true
+
 source 'https://rubygems.org'
 
-gem 'cuba'
-gem 'puma'
-gem 'rack'
 gem 'acme-client'
-gem 'redis'
-gem 'pry-byebug'
-gem 'whenever'
+gem 'cuba'
+gem 'logstash-logger'
 gem 'mina'
 gem 'mina-puma', require: false
 gem 'mina-whenever'
+gem 'pry-byebug'
+gem 'puma'
+gem 'rack'
+gem 'redis'
 gem 'sentry-raven'
-gem 'logstash-logger'
+gem 'whenever'
 
 group :test do
-  gem "rspec"
-  gem "fakeredis", :require => "fakeredis/rspec"
+  gem 'fakeredis', require: 'fakeredis/rspec'
+  gem 'rspec'
 end

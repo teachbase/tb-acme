@@ -13,7 +13,6 @@ GEM
       redis (~> 3.2)
     faraday (0.17.0)
       multipart-post (>= 1.2, < 3)
-    logger (1.4.1)
     logstash-event (1.2.02)
     logstash-logger (0.26.1)
       logstash-event (~> 1.2)
@@ -65,7 +64,6 @@ DEPENDENCIES
   acme-client
   cuba
   fakeredis
-  logger
   logstash-logger
   mina
   mina-puma

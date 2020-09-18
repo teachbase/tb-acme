@@ -10,6 +10,7 @@ COPY ./Aptfile /tmp/Aptfile
 RUN apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get -yq dist-upgrade && \
     DEBIAN_FRONTEND=noninteractive apt-get install -yq --no-install-recommends \
     build-essential \
+    cron \
     $(cat /tmp/Aptfile | xargs) && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
@@ -51,7 +52,11 @@ RUN bundle config set deployment 'true' && \
     bundle install
 
 ENV RACK_ENV=production
+ENV APP_ROLE=master
+
+# Update crontab
+RUN bundle exec whenever --update-crontab
 
 EXPOSE 9292
 
-CMD ["bundle", "exec", "puma", "-C", "config/puma.docker.rb"]
+CMD cron && bundle exec puma -C config/puma.docker.rb

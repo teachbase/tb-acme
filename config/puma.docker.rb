@@ -13,7 +13,7 @@ env = (ENV['RACK_ENV'] || 'production')
 
 if env == 'production'
   config = YAML.load_file("#{File.dirname(__FILE__)}/secrets.yml").fetch(env, {})
-  app_dir = File.expand_path("../..", __FILE__)
+  app_dir = File.expand_path('..', __dir__)
 
   rackup "#{app_dir}/config.ru"
   directory app_dir
@@ -22,5 +22,5 @@ if env == 'production'
   pidfile "#{app_dir}/tmp/pids/puma.pid"
   state_path "#{app_dir}/tmp/sockets/puma.state"
 else
-  environment "development"
+  environment 'development'
 end
