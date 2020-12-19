@@ -1,6 +1,12 @@
 # frozen_string_literal: true
 
 Cuba.define do
+  on 'health' do
+    on get do
+      res.status = 200
+      res.write "ok"
+    end
+  end
   on 'api' do
     on 'v1' do
       on post do

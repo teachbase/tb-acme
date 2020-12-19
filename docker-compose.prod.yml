@@ -1,0 +1,74 @@
+version: "3.7"
+
+services:
+  ngx_mruby:
+    container_name: acme_ngx_mruby
+    build:
+      context: .
+      dockerfile: ./.dockerprod/nginx/Dockerfile
+    restart: always
+    volumes:
+      - ./.dockerprod/nginx/certs:/etc/nginx/certs
+      - ./.dockerprod/nginx/config:/etc/nginx/conf.d
+      - ./.dockerprod/nginx/mruby:/etc/nginx/mruby
+      - ./.dockerprod/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - /u1:/webapps/tb_acme/public
+      - private-content:/webapps/tb_acme/private:ro
+    ports:
+      - 80:80
+      - 443:443
+      - 8053:8053
+    depends_on:
+      - redis
+      - api
+    links:
+      - redis
+      - api
+    healthcheck:
+      test: ["CMD-SHELL", "ps ax | grep -v grep | grep nginx || exit 1"]
+      interval: 5s
+
+  api:
+    container_name: acme_api
+    build:
+      context: .
+      dockerfile: ./.dockerprod/acme/Dockerfile
+    tty: true
+    stdin_open: true
+    restart: always
+    volumes:
+      - /u1:/webapps/tb_acme/public
+      - private-content:/webapps/tb_acme/private
+      - ./.dockerprod/acme/secrets.yml:/webapps/tb_acme/config/secrets.yml
+    environment:
+      - RACK_ENV=production
+      - APP_ROLE=master
+    depends_on:
+      - redis
+    ports:
+      - 9292:9292
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9292/health"]
+      interval: 5s
+
+  redis:
+    image: redis:5-alpine
+    container_name: acme_redis
+    restart: always
+    command:
+      - redis-server
+      - /etc/redis/redis.conf
+    expose:
+      - 6379
+    volumes:
+      - redis:/var/lib/redis/data
+      - ./.dockerprod/redis/redis.conf:/etc/redis/redis.conf
+    healthcheck:
+      test: redis-cli ping
+      interval: 1s
+      timeout: 3s
+      retries: 30
+
+volumes:
+  redis:
+  private-content:
