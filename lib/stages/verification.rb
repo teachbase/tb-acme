@@ -54,14 +54,7 @@ module Stages
     end
 
     def write_verification_token
-      dir = File.join(public_path, File.dirname(challenge.filename))
-      FileUtils.mkdir_p(dir) unless Dir.exists?(dir)
-
-      File.write(File.join(public_path, challenge.filename), challenge.file_content)
-    end
-
-    def public_path
-      @public_path ||= Config.settings['public_path']
+      ::AcmeTokenSaver.new.save(challenge.filename, challenge.file_content)
     end
   end
 end

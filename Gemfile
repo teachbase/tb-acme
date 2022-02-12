@@ -14,6 +14,8 @@ gem 'rack'
 gem 'redis'
 gem 'sentry-raven'
 gem 'whenever'
+gem 'aws-sdk-s3'
+gem 'dotenv'
 
 group :test do
   gem 'fakeredis', require: 'fakeredis/rspec'

@@ -1,11 +1,12 @@
 # frozen_string_literal: true
 
 require 'yaml'
+require 'erb'
 
 class Config
   def initialize
     env = ENV['RACK_ENV'] || 'production'
-    @settings = YAML.load_file("#{File.dirname(__FILE__)}/../config/secrets.yml").fetch(env, {})
+    @settings = YAML.load(ERB.new(File.read("#{__dir__}/../config/secrets.yml")).result).fetch(env, {})
   end
 
   def settings

@@ -13,7 +13,9 @@ module Stages
     def call
       return @resource if @resource.invalid?
 
-      write_to_filesystem
+      # TODO: remove it or move to a k8s persitent volume
+      # write_to_filesystem
+
       write_to_account
       write_to_storage
       $logger.info('[OK] Certificate saved')

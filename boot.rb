@@ -9,6 +9,10 @@ require 'json'
 require 'openssl'
 require 'logstash-logger'
 require 'raven'
+require 'aws-sdk-s3'
+require 'dotenv'
+
+Dotenv.load
 
 Dir["#{File.dirname(__FILE__)}/lib/**/*.rb"].each { |f| require(f) }
 
