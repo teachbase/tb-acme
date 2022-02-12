@@ -5,3 +5,4 @@ config/secrets.prod.yml
 .vscode/
 .dockerprod/
 .env
+.rspec_examples.txt
